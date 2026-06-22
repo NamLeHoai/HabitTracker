@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  html,body{margin:0;padding:0;}
+  ::-webkit-scrollbar{width:0;height:0;display:none;}
+  *{scrollbar-width:none;}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes slideup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .rnd{font-family:'Nunito', -apple-system, system-ui !important;}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 0%, #EFE8DD 0%, #E3DBCF 100%);padding:28px;font-family:-apple-system, system-ui, sans-serif;">
+  <div style="position:relative;width:390px;height:844px;border-radius:54px;box-shadow:0 50px 100px rgba(40,28,12,.32), 0 0 0 12px #17130f, 0 0 0 14px #2b2520, 0 0 0 15px #000;overflow:hidden;">
+    <!-- dynamic island -->
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:55;"></div>
+    <!-- status bar -->
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:54;display:flex;align-items:center;justify-content:space-between;padding:17px 32px 0;pointer-events:none;color:var(--text,#1d1a16);">
+      <span style="font-weight:650;font-size:15px;letter-spacing:.2px;">9:41</span>
+      <span style="display:flex;gap:7px;align-items:center;">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7.5" width="3" height="4.5" rx=".6" fill="currentColor"/><rect x="4.5" y="5" width="3" height="7" rx=".6" fill="currentColor"/><rect x="9" y="2.5" width="3" height="9.5" rx=".6" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx=".6" fill="currentColor"/></svg>
+        <svg width="16" height="12" viewBox="0 0 17 12"><path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill="currentColor"/><path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z" fill="currentColor"/><circle cx="8.5" cy="10.5" r="1.4" fill="currentColor"/></svg>
+        <svg width="25" height="12" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke="currentColor" stroke-opacity=".35" fill="none"/><rect x="2" y="2" width="20" height="9" rx="2" fill="currentColor"/><path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill="currentColor" fill-opacity=".4"/></svg>
+      </span>
+    </div>
+
+    <!-- theme root -->
+    <div style="{{ themeStyle }}">
+      <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+
+        <!-- ============ TODAY ============ -->
+        <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+            <!-- header -->
+            <div style="flex:none;padding:62px 20px 10px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                <div>
+                  <div style="font-size:15px;font-weight:600;color:var(--acc);letter-spacing:.2px;">{{ greeting }}</div>
+                  <div style="font-size:28px;font-weight:800;letter-spacing:-.6px;margin-top:2px;white-space:nowrap;font-family:'Nunito', -apple-system, system-ui;">{{ todayDateLabel }}</div>
+                </div>
+                <div style="display:flex;gap:9px;align-items:center;">
+                  <div onClick="{{ toggleDir }}" style="display:flex;background:var(--pill);border-radius:11px;padding:3px;gap:2px;cursor:pointer;">
+                    <div style="{{ dirAStyle }}">A</div>
+                    <div style="{{ dirBStyle }}">B</div>
+                  </div>
+                  <div onClick="{{ toggleTheme }}" style="width:38px;height:38px;border-radius:50%;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;">{{ themeIcon }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- scroll body -->
+            <div style="flex:1;overflow:auto;padding:6px 20px 120px;">
+
+              <!-- DIRECTION A -->
+              <sc-if value="{{ isDirA }}" hint-placeholder-val="{{ true }}">
+                <div style="background:linear-gradient(135deg, var(--acc), color-mix(in srgb, var(--acc) 55%, #ff9d57));border-radius:26px;padding:20px 22px;color:#fff;box-shadow:0 12px 28px color-mix(in srgb, var(--acc) 40%, transparent);margin-bottom:22px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                      <div style="font-size:13px;font-weight:600;opacity:.9;">TODAY'S PROGRESS</div>
+                      <div style="font-size:34px;font-weight:800;margin-top:3px;font-family:'Nunito', -apple-system, system-ui;line-height:1;">{{ dayDoneCount }}<span style="opacity:.7;font-weight:700;"> / {{ dayTotal }}</span></div>
+                      <div style="font-size:13.5px;opacity:.92;margin-top:5px;">{{ dayMsg }}</div>
+                    </div>
+                    <div style="position:relative;width:74px;height:74px;flex:none;">
+                      <svg width="74" height="74" viewBox="0 0 74 74">
+                        <circle cx="37" cy="37" r="31" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/>
+                        <circle cx="37" cy="37" r="31" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="194.8" stroke-dashoffset="{{ dayRingOff }}" transform="rotate(-90 37 37)" style="transition:stroke-dashoffset .5s;"/>
+                      </svg>
+                      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Nunito', -apple-system, system-ui;">{{ dayPctLabel }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.6px;margin:0 4px 12px;">DUE TODAY</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <sc-for list="{{ todayHabits }}" as="h" hint-placeholder-count="5">
+                    <div style="{{ h.cvar }}">
+                      <div onClick="{{ h.openDetail }}" style="display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid color-mix(in srgb, var(--c) 22%, transparent);border-radius:22px;padding:14px 16px;box-shadow:var(--elev);cursor:pointer;">
+                      <div style="width:46px;height:46px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;font-size:23px;background:color-mix(in srgb, var(--c) 16%, var(--card));">{{ h.icon }}</div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:16.5px;font-weight:650;letter-spacing:-.2px;">{{ h.name }}</div>
+                        <div style="font-size:13px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:6px;">
+                          <span style="{{ h.quitStyle }}">{{ h.quitTag }}</span>
+                          <span>{{ h.sub }}</span>
+                        </div>
+                      </div>
+                      <div onClick="{{ h.toggle }}" style="position:relative;width:46px;height:46px;flex:none;">
+                        <div style="{{ h.ringBg }}"></div>
+                        <div style="{{ h.centerStyle }}">{{ h.center }}</div>
+                      </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <!-- mood quick -->
+                <div style="background:var(--card);border-radius:22px;padding:18px 18px 16px;box-shadow:var(--elev);margin-top:22px;">
+                  <div style="font-size:15.5px;font-weight:700;">How are you feeling?</div>
+                  <div style="display:flex;justify-content:space-between;margin-top:14px;">
+                    <sc-for list="{{ moodOptions }}" as="m" hint-placeholder-count="5">
+                      <div onClick="{{ m.pick }}" style="{{ m.style }}">{{ m.emoji }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- DIRECTION B -->
+              <sc-if value="{{ isDirB }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0 6px;">
+                  <div style="position:relative;width:212px;height:212px;animation:floaty 5s ease-in-out infinite;">
+                    <svg width="212" height="212" viewBox="0 0 212 212">
+                      <circle cx="106" cy="106" r="92" fill="none" stroke="var(--pill)" stroke-width="20"/>
+                      <circle cx="106" cy="106" r="92" fill="none" stroke="url(#bgrad)" stroke-width="20" stroke-linecap="round" stroke-dasharray="578.1" stroke-dashoffset="{{ dayRingOffBig }}" transform="rotate(-90 106 106)" style="transition:stroke-dashoffset .6s;"/>
+                      <defs><linearGradient id="bgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--acc)"/><stop offset="1" stop-color="#FFB23E"/></linearGradient></defs>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                      <div style="font-size:56px;font-weight:850;font-family:'Nunito', -apple-system, system-ui;line-height:1;letter-spacing:-2px;">{{ dayPctLabel }}</div>
+                      <div style="font-size:14px;font-weight:600;color:var(--sub);margin-top:4px;">{{ dayDoneCount }} of {{ dayTotal }} done</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-top:14px;">
+                    <div style="display:flex;align-items:center;gap:6px;background:color-mix(in srgb, #FF6B5E 14%, var(--card));color:#FF6B5E;font-weight:750;font-size:14px;padding:8px 14px;border-radius:13px;">🔥 {{ flameStreak }} day streak</div>
+                    <div style="display:flex;align-items:center;gap:6px;background:color-mix(in srgb, #FFB23E 16%, var(--card));color:#E0911C;font-weight:750;font-size:14px;padding:8px 14px;border-radius:13px;">⚡ {{ xpLabel }}</div>
+                  </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;">
+                  <sc-for list="{{ todayHabits }}" as="h" hint-placeholder-count="6">
+                    <div style="{{ h.cvar }}">
+                      <div onClick="{{ h.toggle }}" style="{{ h.chipStyle }}">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                          <div style="width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;background:{{ h.chipIconBg }};">{{ h.icon }}</div>
+                          <div style="{{ h.chipCheckStyle }}">{{ h.center }}</div>
+                        </div>
+                        <div style="margin-top:12px;font-size:15px;font-weight:700;letter-spacing:-.2px;">{{ h.name }}</div>
+                        <div style="font-size:12.5px;font-weight:600;margin-top:2px;opacity:.75;">{{ h.sub }}</div>
+                        <div style="height:6px;border-radius:4px;margin-top:10px;background:{{ h.chipTrack }};overflow:hidden;">
+                          <div style="height:100%;border-radius:4px;width:{{ h.pctWidth }};background:{{ h.chipBar }};transition:width .45s;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ STATS ============ -->
+        <sc-if value="{{ isStats }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+            <div style="flex:none;padding:62px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:30px;font-weight:800;letter-spacing:-.6px;" class="rnd">Insights</div>
+                <div style="font-size:13.5px;color:var(--sub);font-weight:600;margin-top:1px;">Last 30 days</div>
+              </div>
+              <div onClick="{{ toggleTheme }}" style="width:38px;height:38px;border-radius:50%;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;">{{ themeIcon }}</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:10px 20px 120px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="background:var(--card);border-radius:20px;padding:16px 17px;box-shadow:var(--elev);">
+                  <div style="font-size:13px;color:var(--sub);font-weight:650;">Completion</div>
+                  <div style="font-size:32px;font-weight:850;margin-top:4px;color:var(--acc);" class="rnd">{{ stAvg }}</div>
+                </div>
+                <div style="background:var(--card);border-radius:20px;padding:16px 17px;box-shadow:var(--elev);">
+                  <div style="font-size:13px;color:var(--sub);font-weight:650;">Best streak</div>
+                  <div style="font-size:32px;font-weight:850;margin-top:4px;" class="rnd">{{ stBest }}<span style="font-size:16px;"> 🔥</span></div>
+                </div>
+                <div style="background:var(--card);border-radius:20px;padding:16px 17px;box-shadow:var(--elev);">
+                  <div style="font-size:13px;color:var(--sub);font-weight:650;">Check-ins</div>
+                  <div style="font-size:32px;font-weight:850;margin-top:4px;" class="rnd">{{ stTotal }}</div>
+                </div>
+                <div style="background:var(--card);border-radius:20px;padding:16px 17px;box-shadow:var(--elev);">
+                  <div style="font-size:13px;color:var(--sub);font-weight:650;">Perfect days</div>
+                  <div style="font-size:32px;font-weight:850;margin-top:4px;" class="rnd">{{ stPerfect }}<span style="font-size:16px;"> ⭐</span></div>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+                <div style="font-size:15.5px;font-weight:750;">Activity</div>
+                <div style="font-size:12.5px;color:var(--sub);margin-top:2px;margin-bottom:14px;">Last 18 weeks</div>
+                <div style="{{ stHeatCvar }}">
+                  <div style="overflow-x:auto;">
+                    <div style="display:flex;gap:3px;min-width:max-content;">
+                      <sc-for list="{{ stHeatWeeks }}" as="w" hint-placeholder-count="18">
+                        <div style="display:flex;flex-direction:column;gap:3px;">
+                          <sc-for list="{{ w.cells }}" as="c" hint-placeholder-count="7">
+                            <div style="{{ c.style }}"></div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-top:12px;font-size:11px;color:var(--sub);">
+                  <span>Less</span>
+                  <div style="{{ stHeatCvar }}"><div style="display:flex;gap:3px;">
+                    <div style="width:11px;height:11px;border-radius:3px;background:var(--pill);"></div>
+                    <div style="width:11px;height:11px;border-radius:3px;background:color-mix(in srgb,var(--c) 46%,var(--pill));"></div>
+                    <div style="width:11px;height:11px;border-radius:3px;background:var(--c);"></div>
+                  </div></div>
+                  <span>More</span>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                  <div style="font-size:15.5px;font-weight:750;">Best day of week</div>
+                  <div style="font-size:13.5px;font-weight:750;color:var(--acc);">{{ bestDayLabel }}</div>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:8px;height:96px;margin-top:16px;">
+                  <sc-for list="{{ dowBars }}" as="b" hint-placeholder-count="7">
+                    <div style="{{ b.style }}">
+                      <div style="{{ b.barStyle }}"></div>
+                      <div style="font-size:11px;font-weight:650;color:var(--sub);">{{ b.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+                <div style="font-size:15.5px;font-weight:750;">Weekly trend</div>
+                <div style="display:flex;align-items:flex-end;gap:7px;height:80px;margin-top:16px;">
+                  <sc-for list="{{ weekBars }}" as="b" hint-placeholder-count="8">
+                    <div style="{{ b.style }}"><div style="{{ b.barStyle }}"></div></div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:8px;"><span>8 wks ago</span><span>This week</span></div>
+              </div>
+
+              <div style="font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.6px;margin:22px 4px 12px;">PER HABIT</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <sc-for list="{{ habitRows }}" as="h" hint-placeholder-count="7">
+                  <div style="{{ h.cvar }}">
+                    <div onClick="{{ h.open }}" style="display:flex;align-items:center;gap:13px;background:var(--card);border-radius:18px;padding:13px 15px;box-shadow:var(--elev);cursor:pointer;">
+                    <div style="width:40px;height:40px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:color-mix(in srgb,var(--c) 16%,var(--card));">{{ h.icon }}</div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="display:flex;justify-content:space-between;"><span style="font-size:15px;font-weight:650;">{{ h.name }}</span><span style="font-size:13px;font-weight:700;color:var(--c);">{{ h.ratePct }}</span></div>
+                      <div style="height:6px;border-radius:4px;background:var(--pill);margin-top:8px;overflow:hidden;"><div style="height:100%;border-radius:4px;width:{{ h.barW }};background:var(--c);"></div></div>
+                    </div>
+                    <div style="font-size:13px;font-weight:750;color:var(--sub);flex:none;display:flex;align-items:center;gap:3px;">🔥{{ h.streak }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ MOOD ============ -->
+        <sc-if value="{{ isMood }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+            <div style="flex:none;padding:62px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:30px;font-weight:800;letter-spacing:-.6px;" class="rnd">Mood</div>
+              <div onClick="{{ toggleTheme }}" style="width:38px;height:38px;border-radius:50%;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;">{{ themeIcon }}</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:10px 20px 120px;">
+              <div style="background:linear-gradient(135deg,#34C77B,#1FC6B8);border-radius:24px;padding:22px;color:#fff;box-shadow:0 12px 28px rgba(31,198,184,.32);display:flex;align-items:center;gap:18px;">
+                <div style="font-size:58px;line-height:1;">{{ moodAvgEmoji }}</div>
+                <div>
+                  <div style="font-size:21px;font-weight:800;line-height:1.15;" class="rnd">{{ moodAvgLabel }}</div>
+                  <div style="font-size:13.5px;opacity:.92;margin-top:4px;">This month · {{ moodTracked }}</div>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+                <div style="font-size:15.5px;font-weight:750;margin-bottom:16px;">This week</div>
+                <div style="display:flex;align-items:flex-end;gap:9px;height:110px;">
+                  <sc-for list="{{ moodWeek }}" as="m" hint-placeholder-count="7">
+                    <div style="{{ m.style }}">
+                      <div style="font-size:15px;">{{ m.emoji }}</div>
+                      <div style="{{ m.barStyle }}"></div>
+                      <div style="font-size:11px;font-weight:650;color:var(--sub);">{{ m.day }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border-radius:22px;padding:18px 18px 16px;box-shadow:var(--elev);margin-top:14px;">
+                <div style="font-size:15.5px;font-weight:750;">How are you today?</div>
+                <div style="display:flex;justify-content:space-between;margin-top:14px;">
+                  <sc-for list="{{ moodOptions }}" as="m" hint-placeholder-count="5">
+                    <div onClick="{{ m.pick }}" style="{{ m.style }}">{{ m.emoji }}</div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+                <div style="font-size:15.5px;font-weight:750;margin-bottom:14px;">Distribution</div>
+                <div style="display:flex;flex-direction:column;gap:11px;">
+                  <sc-for list="{{ moodDist }}" as="d" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <div style="font-size:21px;width:26px;">{{ d.emoji }}</div>
+                      <div style="flex:1;height:9px;border-radius:5px;background:var(--pill);overflow:hidden;"><div style="height:100%;border-radius:5px;width:{{ d.w }};background:{{ d.color }};transition:width .4s;"></div></div>
+                      <div style="font-size:12.5px;font-weight:700;color:var(--sub);width:34px;text-align:right;">{{ d.pct }}%</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ FOCUS ============ -->
+        <sc-if value="{{ isFocus }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+            <div style="flex:none;padding:62px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:30px;font-weight:800;letter-spacing:-.6px;" class="rnd">Focus</div>
+              <div onClick="{{ toggleTheme }}" style="width:38px;height:38px;border-radius:50%;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;">{{ themeIcon }}</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:14px 20px 120px;display:flex;flex-direction:column;align-items:center;">
+              <div style="position:relative;width:248px;height:248px;margin-top:18px;">
+                <svg width="248" height="248" viewBox="0 0 248 248">
+                  <circle cx="124" cy="124" r="110" fill="none" stroke="var(--pill)" stroke-width="16"/>
+                  <circle cx="124" cy="124" r="110" fill="none" stroke="url(#fgrad)" stroke-width="16" stroke-linecap="round" stroke-dasharray="691.2" stroke-dashoffset="{{ timerRingOff }}" transform="rotate(-90 124 124)" style="transition:stroke-dashoffset 1s linear;"/>
+                  <defs><linearGradient id="fgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--acc)"/><stop offset="1" stop-color="#FFB23E"/></linearGradient></defs>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div style="font-size:54px;font-weight:850;letter-spacing:-1px;font-variant-numeric:tabular-nums;" class="rnd">{{ timerLabel }}</div>
+                  <div style="font-size:13.5px;color:var(--sub);font-weight:600;margin-top:2px;">stay focused</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:4px;background:var(--pill);border-radius:15px;padding:4px;width:100%;margin-top:26px;">
+                <sc-for list="{{ presets }}" as="p" hint-placeholder-count="4">
+                  <div onClick="{{ p.pick }}" style="{{ p.style }}">{{ p.label }}</div>
+                </sc-for>
+              </div>
+
+              <div style="display:flex;gap:12px;width:100%;margin-top:16px;">
+                <div onClick="{{ resetTimer }}" style="width:54px;height:54px;flex:none;border-radius:17px;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 108-8M4 12V6m0 6h6" stroke="var(--sub)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div onClick="{{ toggleTimer }}" style="{{ timerBtnStyle }}">{{ timerBtnLabel }}</div>
+              </div>
+
+              <div style="font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.6px;align-self:flex-start;margin:26px 4px 12px;">AMBIENT SOUND</div>
+              <div style="display:flex;gap:10px;width:100%;">
+                <sc-for list="{{ ambient }}" as="a" hint-placeholder-count="4">
+                  <div onClick="{{ a.toggle }}" style="{{ a.style }}">
+                    <div style="font-size:24px;">{{ a.emoji }}</div>
+                    <div style="font-size:12px;font-weight:650;">{{ a.name }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!--SCREENS-->
+
+        <!-- ============ TAB BAR ============ -->
+        <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;padding:8px 16px 28px;background:linear-gradient(to top, var(--bg) 62%, transparent);">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--nav);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--sep);border-radius:26px;padding:10px 14px;box-shadow:var(--elev);">
+            <div onClick="{{ goToday }}" style="{{ tabTodayStyle }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="4" stroke="currentColor" stroke-width="2"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 14l2.5 2.5L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:10.5px;font-weight:650;margin-top:3px;">Today</span>
+            </div>
+            <div onClick="{{ goStats }}" style="{{ tabStatsStyle }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 20V10M12 20V4M19 20v-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+              <span style="font-size:10.5px;font-weight:650;margin-top:3px;">Stats</span>
+            </div>
+            <div onClick="{{ openCreate }}" style="width:54px;height:54px;border-radius:18px;flex:none;background:linear-gradient(135deg,var(--acc),#FFB23E);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px color-mix(in srgb,var(--acc) 45%,transparent);cursor:pointer;margin-top:-22px;">
+              <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg>
+            </div>
+            <div onClick="{{ goMood }}" style="{{ tabMoodStyle }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10.5" r="1.2" fill="currentColor"/><circle cx="15" cy="10.5" r="1.2" fill="currentColor"/><path d="M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span style="font-size:10.5px;font-weight:650;margin-top:3px;">Mood</span>
+            </div>
+            <div onClick="{{ goFocus }}" style="{{ tabFocusStyle }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 13V9M12 5h0M9.5 5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span style="font-size:10.5px;font-weight:650;margin-top:3px;">Focus</span>
+            </div>
+          </div>
+        </div>
+
+      </sc-if>
+    </div>
+
+    <!-- ============ DETAIL ============ -->
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ overlayStyle }}">
+        <div style="{{ dCvar }}">
+          <div style="flex:none;padding:58px 18px 6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div onClick="{{ back }}" style="width:40px;height:40px;border-radius:50%;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="11" height="18" viewBox="0 0 12 20" fill="none"><path d="M10 2L2 10l8 8" stroke="var(--sub)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--card);box-shadow:var(--elev);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="18" height="5" viewBox="0 0 22 6"><circle cx="3" cy="3" r="2.6" fill="var(--sub)"/><circle cx="11" cy="3" r="2.6" fill="var(--sub)"/><circle cx="19" cy="3" r="2.6" fill="var(--sub)"/></svg>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;margin-top:14px;padding:0 4px;">
+              <div style="width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;background:color-mix(in srgb,var(--c) 18%,var(--card));">{{ dIcon }}</div>
+              <div>
+                <div style="font-size:25px;font-weight:800;letter-spacing:-.4px;" class="rnd">{{ dName }}</div>
+                <div style="font-size:13.5px;color:var(--sub);font-weight:600;margin-top:1px;">{{ dCat }} · {{ dSchedLabel }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:auto;padding:14px 20px 40px;">
+            <div style="background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 60%,#fff));border-radius:24px;padding:20px 22px;color:#fff;box-shadow:0 12px 26px color-mix(in srgb,var(--c) 38%,transparent);display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:650;opacity:.92;">CURRENT STREAK</div>
+                <div style="font-size:46px;font-weight:850;line-height:1;margin-top:4px;" class="rnd">{{ dStreak }}<span style="font-size:19px;font-weight:700;opacity:.85;"> days</span></div>
+              </div>
+              <div style="font-size:46px;">🔥</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px;">
+              <div style="background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--elev);">
+                <div style="font-size:22px;font-weight:850;" class="rnd">{{ dBest }}</div>
+                <div style="font-size:11.5px;color:var(--sub);font-weight:600;margin-top:2px;">Best</div>
+              </div>
+              <div style="background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--elev);">
+                <div style="font-size:22px;font-weight:850;color:var(--c);" class="rnd">{{ dRate }}</div>
+                <div style="font-size:11.5px;color:var(--sub);font-weight:600;margin-top:2px;">30-day</div>
+              </div>
+              <div style="background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--elev);">
+                <div style="font-size:22px;font-weight:850;" class="rnd">{{ dTotal }}</div>
+                <div style="font-size:11.5px;color:var(--sub);font-weight:600;margin-top:2px;">Total</div>
+              </div>
+            </div>
+
+            <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+              <div style="font-size:16px;font-weight:750;margin-bottom:14px;">{{ calMonthLabel }}</div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px;">
+                <sc-for list="{{ calWeekdays }}" as="d" hint-placeholder-count="7">
+                  <div style="text-align:center;font-size:11.5px;font-weight:700;color:var(--faint);">{{ d.l }}</div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
+                <sc-for list="{{ calCells }}" as="c" hint-placeholder-count="35">
+                  <div style="{{ c.style }}">{{ c.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--elev);margin-top:14px;">
+              <div style="font-size:16px;font-weight:750;margin-bottom:14px;">Last 18 weeks</div>
+              <div style="overflow-x:auto;">
+                <div style="display:flex;gap:3px;min-width:max-content;">
+                  <sc-for list="{{ heatWeeks }}" as="w" hint-placeholder-count="18">
+                    <div style="display:flex;flex-direction:column;gap:3px;">
+                      <sc-for list="{{ w.cells }}" as="c" hint-placeholder-count="7">
+                        <div style="{{ c.style }}"></div>
+                      </sc-for>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ CREATE ============ -->
+    <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ overlayStyle }}">
+        <div style="{{ drPreviewCvar }}">
+          <div style="flex:none;padding:56px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
+            <div onClick="{{ back }}" style="font-size:16px;font-weight:600;color:var(--sub);cursor:pointer;">Cancel</div>
+            <div style="font-size:17px;font-weight:750;" class="rnd">New Habit</div>
+            <div style="width:52px;"></div>
+          </div>
+
+          <div style="flex:1;overflow:auto;padding:10px 20px 40px;">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0 18px;">
+              <div style="width:84px;height:84px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:44px;background:color-mix(in srgb,var(--c) 18%,var(--card));border:2px solid color-mix(in srgb,var(--c) 40%,transparent);">{{ drIcon }}</div>
+              <div style="font-size:19px;font-weight:800;margin-top:12px;" class="rnd">{{ drNameLabel }}</div>
+            </div>
+
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin:0 2px 8px;">NAME</div>
+            <input value="{{ drName }}" onInput="{{ setName }}" placeholder="e.g. Drink water" style="width:100%;box-sizing:border-box;background:var(--card);border:1.5px solid var(--sep);border-radius:15px;padding:15px 16px;font-size:16px;font-weight:600;color:var(--text);outline:none;font-family:inherit;" />
+
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin:20px 2px 10px;">ICON</div>
+            <div style="overflow-x:auto;"><div style="display:flex;gap:9px;min-width:max-content;padding-bottom:2px;">
+              <sc-for list="{{ iconOptions }}" as="i" hint-placeholder-count="10">
+                <div onClick="{{ i.pick }}" style="{{ i.style }}">{{ i.ic }}</div>
+              </sc-for>
+            </div></div>
+
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin:20px 2px 10px;">COLOR</div>
+            <div style="display:flex;gap:11px;flex-wrap:wrap;">
+              <sc-for list="{{ colorOptions }}" as="c" hint-placeholder-count="8">
+                <div onClick="{{ c.pick }}" style="{{ c.style }}"></div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin:22px 2px 10px;">TYPE</div>
+            <div style="display:flex;gap:5px;background:var(--pill);border-radius:15px;padding:4px;">
+              <div onClick="{{ pickBuild }}" style="{{ buildStyle }}">✅ Build</div>
+              <div onClick="{{ pickQuit }}" style="{{ quitStyle }}">🚫 Quit</div>
+            </div>
+
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin:22px 2px 10px;">GOAL</div>
+            <div style="display:flex;gap:5px;background:var(--pill);border-radius:15px;padding:4px;">
+              <div onClick="{{ pickCheck }}" style="{{ checkStyle }}">Checkmark</div>
+              <div onClick="{{ pickMeasure }}" style="{{ measureStyle }}">Measurable</div>
+            </div>
+
+            <sc-if value="{{ isMeasure }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:12px;margin-top:12px;">
+                <div style="flex:none;width:110px;">
+                  <div style="font-size:11.5px;font-weight:650;color:var(--sub);margin:0 2px 6px;">Target</div>
+                  <input value="{{ drTarget }}" onInput="{{ setTarget }}" inputmode="numeric" style="width:100%;box-sizing:border-box;background:var(--card);border:1.5px solid var(--sep);border-radius:14px;padding:13px 14px;font-size:16px;font-weight:700;color:var(--text);outline:none;font-family:inherit;" />
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:11.5px;font-weight:650;color:var(--sub);margin:0 2px 6px;">Unit</div>
+                  <input value="{{ drUnit }}" onInput="{{ setUnit }}" placeholder="glasses" style="width:100%;box-sizing:border-box;background:var(--card);border:1.5px solid var(--sep);border-radius:14px;padding:13px 14px;font-size:16px;font-weight:600;color:var(--text);outline:none;font-family:inherit;" />
+                </div>
+              </div>
+            </sc-if>
+
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin:22px 2px 10px;">SCHEDULE</div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap;">
+              <sc-for list="{{ schedOptions }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.label }}</div>
+              </sc-for>
+            </div>
+
+            <div onClick="{{ saveHabit }}" style="{{ saveStyle }}">Create Habit</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!--OVERLAYS-->
+    <!-- ONBOARDING -->
+    <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ obRootStyle }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;text-align:center;">
+          <div style="font-size:104px;line-height:1;animation:floaty 4s ease-in-out infinite;">{{ obIcon }}</div>
+          <div style="font-size:30px;font-weight:850;letter-spacing:-.6px;margin-top:36px;font-family:'Nunito', -apple-system, system-ui;">{{ obTitle }}</div>
+          <div style="font-size:16px;line-height:1.5;color:var(--sub);margin-top:12px;max-width:280px;">{{ obBody }}</div>
+        </div>
+        <div style="flex:none;padding:0 28px 46px;">
+          <div style="display:flex;gap:7px;justify-content:center;margin-bottom:26px;">
+            <sc-for list="{{ obDots }}" as="d" hint-placeholder-count="3">
+              <div style="{{ d.style }}"></div>
+            </sc-for>
+          </div>
+          <div onClick="{{ obNext }}" style="background:linear-gradient(135deg,var(--acc),#FFB23E);color:#fff;font-size:17px;font-weight:750;text-align:center;padding:17px;border-radius:18px;box-shadow:0 10px 22px color-mix(in srgb,var(--acc) 40%,transparent);cursor:pointer;">{{ obCta }}</div>
+          <div onClick="{{ obSkip }}" style="text-align:center;color:var(--sub);font-size:14.5px;font-weight:600;margin-top:16px;cursor:pointer;">{{ obSkipLabel }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- home indicator -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:28px;display:flex;justify-content:center;align-items:flex-end;padding-bottom:9px;z-index:70;pointer-events:none;">
+      <div style="width:134px;height:5px;border-radius:9px;background:var(--ind,rgba(40,28,12,.28));"></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:446,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const P={blue:'#3B9EFF',coral:'#FF6B5E',amber:'#FFB23E',indigo:'#7B79FF',pink:'#FF6FA8',teal:'#1FC6B8',green:'#34C77B',purple:'#B36BFF'};
+    this.P=P;
+    this.today=new Date(2026,5,21); // Sunday June 21 2026
+    this.habits=[
+      {id:'water',name:'Drink Water',icon:'💧',color:P.blue,cat:'Health',type:'build',sched:{type:'daily'},goal:{type:'measure',target:8,unit:'glasses',step:1},rel:0.9},
+      {id:'run',name:'Morning Run',icon:'🏃',color:P.coral,cat:'Fitness',type:'build',sched:{type:'week',days:[1,3,5]},goal:{type:'measure',target:30,unit:'min',step:5},rel:0.8},
+      {id:'read',name:'Read',icon:'📖',color:P.amber,cat:'Mind',type:'build',sched:{type:'daily'},goal:{type:'measure',target:30,unit:'min',step:10},rel:0.82},
+      {id:'meditate',name:'Meditate',icon:'🧘',color:P.indigo,cat:'Mind',type:'build',sched:{type:'daily'},goal:{type:'check'},rel:0.88},
+      {id:'vitamins',name:'Vitamins',icon:'💊',color:P.green,cat:'Health',type:'build',sched:{type:'daily'},goal:{type:'check'},rel:0.92},
+      {id:'sugar',name:'No Sugar',icon:'🍩',color:P.pink,cat:'Health',type:'quit',sched:{type:'daily'},goal:{type:'check'},rel:0.78},
+      {id:'sleep',name:'Sleep by 11',icon:'🌙',color:P.teal,cat:'Sleep',type:'build',sched:{type:'daily'},goal:{type:'check'},rel:0.8},
+    ];
+    this.logs=this.buildHistory();
+    this.moods=this.buildMoods();
+    this.state={view:'onboarding',tab:'today',selected:null,dark:false,dir:'A',obStep:0,
+      timer:25*60,timerRun:false,timerTotal:25*60,timerMin:25,
+      ambient:{Rain:false,Forest:false,Waves:false,Cafe:false},
+      draft:null,tick:0};
+  }
+  componentWillUnmount(){ if(this._iv) clearInterval(this._iv); }
+
+  // ---- date utils ----
+  pad(n){return n<10?'0'+n:''+n;}
+  key(d){return d.getFullYear()+'-'+this.pad(d.getMonth()+1)+'-'+this.pad(d.getDate());}
+  addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  rnd(id,off){let h=2166136261;const s=id+'|'+off;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return((h>>>0)%100000)/100000;}
+  sched(h,d){if(h.sched.type==='daily')return true;return h.sched.days.includes(d.getDay());}
+
+  buildHistory(){
+    const logs={};
+    for(const h of this.habits){
+      logs[h.id]={};
+      for(let off=1;off<=120;off++){
+        const d=this.addDays(this.today,-off);
+        if(!this.sched(h,d))continue;
+        const done=this.rnd(h.id,off)<h.rel;
+        if(done){logs[h.id][this.key(d)]=h.goal.type==='measure'?h.goal.target:1;}
+        else if(h.goal.type==='measure'&&this.rnd(h.id,off+777)<0.45){logs[h.id][this.key(d)]=Math.max(1,Math.round(h.goal.target*(0.2+0.5*this.rnd(h.id,off+9))));}
+      }
+    }
+    const tk=this.key(this.today);
+    logs.water[tk]=3; logs.meditate[tk]=1; logs.vitamins[tk]=1; logs.sugar[tk]=1;
+    return logs;
+  }
+  buildMoods(){
+    const m={};
+    for(let off=1;off<=45;off++){const d=this.addDays(this.today,-off);const r=this.rnd('mood',off);m[this.key(d)]=r<.12?2:r<.32?3:r<.7?4:5;}
+    return m;
+  }
+
+  val(h,d){const v=this.logs[h.id]&&this.logs[h.id][this.key(d)];return v||0;}
+  done(h,d){const v=this.val(h,d);return h.goal.type==='measure'?v>=h.goal.target:v>=1;}
+
+  streak(h){let c=0;for(let off=0;off<400;off++){const d=this.addDays(this.today,-off);if(!this.sched(h,d))continue;if(this.done(h,d))c++;else if(off===0)continue;else break;}return c;}
+  best(h){let b=0,run=0;for(let off=400;off>=0;off--){const d=this.addDays(this.today,-off);if(!this.sched(h,d))continue;if(this.done(h,d)){run++;if(run>b)b=run;}else if(off===0){}else run=0;}return Math.max(b,this.streak(h));}
+  rate(h,days){let s=0,dn=0;for(let off=1;off<=days;off++){const d=this.addDays(this.today,-off);if(!this.sched(h,d))continue;s++;if(this.done(h,d))dn++;}return s?dn/s:0;}
+  totalDone(h){let c=0;const m=this.logs[h.id]||{};for(const k in m){const v=m[k];if(h.goal.type==='measure'?v>=h.goal.target:v>=1)c++;}return c;}
+
+  bump(){this.setState(s=>({tick:s.tick+1}));}
+  toggle(h){const tk=this.key(this.today);const cur=this.logs[h.id][tk]||0;if(h.goal.type==='measure'){this.logs[h.id][tk]=cur>=h.goal.target?0:Math.min(h.goal.target,cur+h.goal.step);}else{this.logs[h.id][tk]=cur>=1?0:1;}this.bump();}
+
+  // ---- theme ----
+  themeVars(){
+    return this.state.dark?{
+      '--bg':'#141210','--bg2':'#1d1916','--card':'#221e19','--text':'#f4efe8','--sub':'#9b9389','--faint':'#6b6359','--sep':'rgba(255,255,255,.08)','--pill':'#2a2521','--acc':'#FF7A6B','--ind':'rgba(255,255,255,.5)','--nav':'rgba(26,22,19,.72)','--elev':'0 8px 24px rgba(0,0,0,.4)'
+    }:{
+      '--bg':'#F4EEE6','--bg2':'#EDE5D9','--card':'#FFFFFF','--text':'#1d1a16','--sub':'#8c8478','--faint':'#bdb4a7','--sep':'rgba(40,28,12,.07)','--pill':'#EBE3D8','--acc':'#FF6B5E','--ind':'rgba(40,28,12,.28)','--nav':'rgba(255,255,255,.74)','--elev':'0 8px 24px rgba(60,44,20,.08)'
+    };
+  }
+
+  todayHabitData(){
+    const list=this.habits.filter(h=>this.sched(h,this.today));
+    const C=119.4;
+    return list.map(h=>{
+      const v=this.val(h,this.today);const done=this.done(h,this.today);
+      const pct=h.goal.type==='measure'?Math.min(1,v/h.goal.target):(done?1:0);
+      let sub,center;
+      if(h.goal.type==='measure'){sub=v+' / '+h.goal.target+' '+h.goal.unit;center=done?'✓':String(v);}
+      else if(h.type==='quit'){sub=done?'Stayed clean today':'Avoid today';center=done?'✓':'';}
+      else{sub=done?'Completed':'Tap to complete';center=done?'✓':'';}
+      return {
+        id:h.id,name:h.name,icon:h.icon,sub,center,isQuit:h.type==='quit',
+        quitTag:h.type==='quit'?'QUIT':'',
+        quitStyle:h.type==='quit'?{fontSize:'9.5px',fontWeight:800,color:'var(--c)',background:'color-mix(in srgb,var(--c) 16%,transparent)',padding:'2px 6px',borderRadius:'5px',letterSpacing:'.4px'}:{display:'none'},
+        cvar:{'--c':h.color,display:'block'},
+        ringOff:C*(1-pct),
+        ringBg:{position:'absolute',inset:0,borderRadius:'50%',background:'conic-gradient(var(--c) '+(pct*360)+'deg, color-mix(in srgb, var(--c) 17%, transparent) 0deg)',WebkitMask:'radial-gradient(closest-side, transparent 71%, #000 72%)',mask:'radial-gradient(closest-side, transparent 71%, #000 72%)',transition:'background .45s'},
+        pctWidth:Math.round(pct*100)+'%',
+        toggle:(e)=>{if(e&&e.stopPropagation)e.stopPropagation();this.toggle(h);},
+        openDetail:()=>this.setState({view:'detail',selected:h.id}),
+        centerStyle:{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:done?'19px':'15px',fontWeight:800,fontFamily:"'Nunito', -apple-system, system-ui",color:'var(--c)'},
+        chipStyle:{background:done?'var(--c)':'var(--card)',color:done?'#fff':'var(--text)',borderRadius:'20px',padding:'15px 15px 16px',boxShadow:'var(--elev)',cursor:'pointer',border:done?'1.5px solid var(--c)':'1.5px solid color-mix(in srgb,var(--c) 20%,transparent)',transition:'background .3s'},
+        chipIconBg:done?'rgba(255,255,255,.22)':'color-mix(in srgb,var(--c) 16%,var(--card))',
+        chipCheckStyle:{width:'26px',height:'26px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',fontWeight:800,background:done?'rgba(255,255,255,.25)':'var(--pill)',color:done?'#fff':'var(--sub)'},
+        chipTrack:done?'rgba(255,255,255,.25)':'var(--pill)',
+        chipBar:done?'#fff':'var(--c)',
+      };
+    });
+  }
+
+  renderVals(){
+    const s=this.state;
+    const th=this.themeHandlers?null:null;
+    const dayHabits=this.habits.filter(h=>this.sched(h,this.today));
+    const doneCount=dayHabits.filter(h=>this.done(h,this.today)).length;
+    const total=dayHabits.length;
+    const pct=total?doneCount/total:0;
+    const moodColors={1:'#FF6B5E',2:'#FF9A52',3:'#FFC83E',4:'#34C77B',5:'#1FC6B8'};
+    const moodEmoji={1:'😣',2:'😕',3:'😐',4:'🙂',5:'😄'};
+    const curMood=this.moods[this.key(this.today)]||0;
+    const flame=Math.max(...this.habits.map(h=>this.streak(h)));
+
+    const out={
+      themeStyle:{width:'100%',height:'100%',display:'flex',flexDirection:'column',position:'relative',background:'var(--bg)',color:'var(--text)',fontFamily:'-apple-system, system-ui, sans-serif',transition:'background .35s, color .35s',...this.themeVars()},
+      showTabs:s.view===null,
+      isToday:s.view===null&&s.tab==='today',
+      isOnboarding:s.view==='onboarding',
+      isDirA:s.dir==='A',isDirB:s.dir==='B',
+      // header
+      greeting:'Good morning',
+      todayDateLabel:this.today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}),
+      themeIcon:s.dark?'☀️':'🌙',
+      toggleTheme:()=>this.setState(p=>({dark:!p.dark})),
+      toggleDir:()=>this.setState(p=>({dir:p.dir==='A'?'B':'A'})),
+      dirAStyle:{padding:'5px 12px',borderRadius:'8px',fontSize:'13px',fontWeight:700,background:s.dir==='A'?'var(--card)':'transparent',color:s.dir==='A'?'var(--acc)':'var(--sub)',boxShadow:s.dir==='A'?'0 1px 3px rgba(0,0,0,.1)':'none'},
+      dirBStyle:{padding:'5px 12px',borderRadius:'8px',fontSize:'13px',fontWeight:700,background:s.dir==='B'?'var(--card)':'transparent',color:s.dir==='B'?'var(--acc)':'var(--sub)',boxShadow:s.dir==='B'?'0 1px 3px rgba(0,0,0,.1)':'none'},
+      // progress
+      dayDoneCount:doneCount,dayTotal:total,
+      dayPctLabel:Math.round(pct*100)+'%',
+      dayRingOff:194.8*(1-pct),
+      dayRingOffBig:578.1*(1-pct),
+      dayMsg:pct>=1?'All done — amazing! 🎉':pct>=.5?'Great momentum, keep going!':'Let\u2019s build some momentum',
+      flameStreak:flame,
+      xpLabel:(doneCount*40)+' XP',
+      todayHabits:this.todayHabitData(),
+      // mood quick
+      moodOptions:[1,2,3,4,5].map(n=>({emoji:moodEmoji[n],pick:()=>{this.moods[this.key(this.today)]=n;this.bump();},style:{width:'48px',height:'48px',borderRadius:'15px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'25px',cursor:'pointer',transition:'transform .15s',background:curMood===n?'color-mix(in srgb,'+moodColors[n]+' 22%, var(--card))':'var(--pill)',transform:curMood===n?'scale(1.12)':'scale(1)',outline:curMood===n?'2px solid '+moodColors[n]:'none'}})),
+      // nav
+      goToday:()=>this.setState({tab:'today'}),
+      goStats:()=>this.setState({tab:'stats'}),
+      goMood:()=>this.setState({tab:'mood'}),
+      goFocus:()=>this.setState({tab:'focus'}),
+      openCreate:()=>this.setState({view:'create',draft:{name:'',icon:'⭐',color:this.P.coral,type:'build',sched:'daily',goalType:'check',target:8,unit:'glasses',step:1}}),
+      tabTodayStyle:this.tabStyle('today'),tabStatsStyle:this.tabStyle('stats'),tabMoodStyle:this.tabStyle('mood'),tabFocusStyle:this.tabStyle('focus'),
+    };
+    Object.assign(out,this.onboardingVals());
+    Object.assign(out,this.screenVals());
+    return out;
+  }
+  tabStyle(id){const active=this.state.tab===id;return{flex:1,display:'flex',flexDirection:'column',alignItems:'center',cursor:'pointer',color:active?'var(--acc)':'var(--faint)',transition:'color .2s'};}
+
+  onboardingVals(){
+    const steps=[
+      {icon:'🌱',title:'Build a better you',body:'Track the habits that matter — one small win at a time. Build good ones, quit the bad.',cta:'Get Started'},
+      {icon:'🎯',title:'Beyond checkmarks',body:'Set measurable goals like 8 glasses of water or a 30-minute run. Real progress, not just a tick.',cta:'Continue'},
+      {icon:'🔥',title:'Keep the streak alive',body:'Watch streaks grow, fill your calendar, and stay motivated with stats and gentle reminders.',cta:'Let\u2019s go'},
+    ];
+    const st=steps[this.state.obStep];
+    return {
+      obRootStyle:{position:'absolute',inset:0,zIndex:40,background:'var(--bg)',color:'var(--text)',display:'flex',flexDirection:'column',paddingTop:'40px',...this.themeVars()},
+      obIcon:st.icon,obTitle:st.title,obBody:st.body,obCta:st.cta,
+      obSkipLabel:this.state.obStep<2?'Skip':' ',
+      obDots:[0,1,2].map(i=>({style:{width:i===this.state.obStep?'24px':'8px',height:'8px',borderRadius:'4px',background:i===this.state.obStep?'var(--acc)':'var(--pill)',transition:'width .3s'}})),
+      obNext:()=>{if(this.state.obStep<2)this.setState(p=>({obStep:p.obStep+1}));else this.setState({view:null,tab:'today'});},
+      obSkip:()=>this.setState({view:null,tab:'today'}),
+    };
+  }
+  // ---- detail: calendar + heatmap ----
+  calData(h){
+    const y=this.today.getFullYear(),m=this.today.getMonth();
+    const startDow=new Date(y,m,1).getDay();
+    const days=new Date(y,m+1,0).getDate();
+    const cells=[];
+    for(let i=0;i<startDow;i++)cells.push({blank:true,label:'',style:{aspectRatio:'1'}});
+    for(let d=1;d<=days;d++){
+      const date=new Date(y,m,d);const isToday=this.key(date)===this.key(this.today);
+      const future=date>this.today&&!isToday;
+      let bg='transparent',col='var(--sub)',bd='none',fw='600';
+      if(!this.sched(h,date)){col='var(--faint)';}
+      else if(future){col='var(--faint)';bd='1.5px solid var(--sep)';}
+      else if(this.done(h,date)){bg='var(--c)';col='#fff';fw='800';}
+      else{col='var(--sub)';bd='1.5px solid color-mix(in srgb,var(--c) 32%,transparent)';}
+      if(isToday&&!this.done(h,date)){bd='2px solid var(--c)';col='var(--c)';fw='800';}
+      cells.push({blank:false,label:String(d),style:{aspectRatio:'1',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'12px',fontSize:'13.5px',fontWeight:fw,background:bg,color:col,border:bd}});
+    }
+    return cells;
+  }
+  heatStyle(level){
+    if(level===-1)return{width:'13px',height:'13px',borderRadius:'3.5px',background:'transparent'};
+    const map={0:'var(--pill)',1:'color-mix(in srgb, var(--c) 24%, var(--pill))',2:'color-mix(in srgb, var(--c) 46%, var(--pill))',3:'color-mix(in srgb, var(--c) 70%, var(--pill))',4:'var(--c)'};
+    return{width:'13px',height:'13px',borderRadius:'3.5px',background:map[level]||'var(--pill)'};
+  }
+  heatData(h){
+    let start=this.addDays(this.today,-7*17);
+    while(start.getDay()!==0)start=this.addDays(start,-1);
+    const weeks=[];let cur=new Date(start);
+    for(let w=0;w<18;w++){
+      const col=[];
+      for(let dow=0;dow<7;dow++){
+        const date=new Date(cur);let level;
+        if(date>this.today)level=-1;
+        else if(h){level=!this.sched(h,date)?0:this.done(h,date)?4:this.val(h,date)>0?2:1;}
+        else{const sc=this.habits.filter(x=>this.sched(x,date));if(!sc.length)level=0;else{const fr=sc.filter(x=>this.done(x,date)).length/sc.length;level=fr===0?1:Math.max(1,Math.ceil(fr*4));}}
+        col.push({style:this.heatStyle(level)});cur=this.addDays(cur,1);
+      }
+      weeks.push({cells:col});
+    }
+    return weeks;
+  }
+
+  detailVals(){
+    const h=this.habits.find(x=>x.id===this.state.selected);
+    if(!h)return{};
+    return{
+      dHabit:h,dName:h.name,dIcon:h.icon,dCat:(h.type==='quit'?'Quit · ':'')+h.cat,
+      dCvar:{'--c':h.color,height:'100%',display:'flex',flexDirection:'column',minHeight:0},
+      dStreak:this.streak(h),dBest:this.best(h),
+      dRate:Math.round(this.rate(h,30)*100)+'%',dTotal:this.totalDone(h),
+      dGoal:h.goal.type==='measure'?('Goal · '+h.goal.target+' '+h.goal.unit):'Goal · Complete daily',
+      dSchedLabel:h.sched.type==='daily'?'Every day':'Mon · Wed · Fri',
+      calMonthLabel:this.today.toLocaleDateString('en-US',{month:'long',year:'numeric'}),
+      calWeekdays:[['s0','S'],['m','M'],['t0','T'],['w','W'],['t1','T'],['f','F'],['s1','S']].map(x=>({k:x[0],l:x[1]})),
+      calCells:this.calData(h),
+      heatWeeks:this.heatData(h),
+    };
+  }
+
+  // ---- stats ----
+  statsVals(){
+    const rates=this.habits.map(h=>this.rate(h,30));
+    const avg=rates.reduce((a,b)=>a+b,0)/(rates.length||1);
+    const best=Math.max(...this.habits.map(h=>this.best(h)));
+    const total=this.habits.reduce((a,h)=>a+this.totalDone(h),0);
+    let perfect=0;for(let off=1;off<=30;off++){const d=this.addDays(this.today,-off);const sc=this.habits.filter(x=>this.sched(x,d));if(sc.length&&sc.every(x=>this.done(x,d)))perfect++;}
+    const dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dows=[0,1,2,3,4,5,6].map(k=>{let s=0,d=0;for(let off=1;off<=84;off++){const dt=this.addDays(this.today,-off);if(dt.getDay()!==k)continue;const sc=this.habits.filter(x=>this.sched(x,dt));s+=sc.length;d+=sc.filter(x=>this.done(x,dt)).length;}return{k,r:s?d/s:0};});
+    const maxDow=Math.max(...dows.map(x=>x.r),0.01);
+    let bi=0;dows.forEach((x,i)=>{if(x.r>dows[bi].r)bi=i;});
+    const wk=[];for(let w=7;w>=0;w--){let s=0,d=0;for(let i=0;i<7;i++){const dt=this.addDays(this.today,-(w*7+i));const sc=this.habits.filter(x=>this.sched(x,dt));s+=sc.length;d+=sc.filter(x=>this.done(x,dt)).length;}wk.push(s?d/s:0);}
+    const maxWk=Math.max(...wk,0.01);
+    return{
+      stAvg:Math.round(avg*100)+'%',stBest:best,stTotal:total,stPerfect:perfect,
+      stHeatCvar:{'--c':'var(--acc)',display:'block'},
+      stHeatWeeks:this.heatData(null),
+      dowBars:dows.map((x,i)=>({label:dn[i].slice(0,1),pctH:Math.max(6,Math.round(x.r/maxDow*100))+'%',top:Math.round(x.r*100)+'%',isBest:i===bi,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',gap:'6px'},barStyle:{width:'100%',maxWidth:'26px',height:Math.max(6,Math.round(x.r/maxDow*100))+'%',borderRadius:'7px 7px 4px 4px',background:i===bi?'var(--acc)':'color-mix(in srgb,var(--acc) 30%,var(--pill))',transition:'height .4s'}})),
+      bestDayLabel:dn[bi],
+      weekBars:wk.map((r,i)=>({h:Math.max(8,Math.round(r/maxWk*100))+'%',style:{flex:1,display:'flex',alignItems:'flex-end',justifyContent:'center'},barStyle:{width:'70%',height:Math.max(8,Math.round(r/maxWk*100))+'%',borderRadius:'6px',background:i===wk.length-1?'var(--acc)':'color-mix(in srgb,var(--acc) 35%,var(--pill))',transition:'height .4s'}})),
+      habitRows:this.habits.map(h=>({name:h.name,icon:h.icon,cvar:{'--c':h.color,display:'block'},streak:this.streak(h),ratePct:Math.round(this.rate(h,30)*100)+'%',barW:Math.round(this.rate(h,30)*100)+'%',open:()=>this.setState({view:'detail',selected:h.id})})),
+    };
+  }
+
+  // ---- mood ----
+  moodVals(){
+    const dn=['S','M','T','W','T','F','S'];
+    const me={1:'😣',2:'😕',3:'😐',4:'🙂',5:'😄'};
+    const mc={1:'#FF6B5E',2:'#FF9A52',3:'#FFC83E',4:'#34C77B',5:'#1FC6B8'};
+    const week=[];for(let off=6;off>=0;off--){const d=this.addDays(this.today,-off);const mv=this.moods[this.key(d)]||0;week.push({day:dn[d.getDay()],emoji:mv?me[mv]:'·',h:(mv?mv/5*100:6)+'%',style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'7px'},barStyle:{width:'78%',maxWidth:'30px',height:(mv?mv/5*100:6)+'%',borderRadius:'8px',background:mv?mc[mv]:'var(--pill)',transition:'height .4s'}});}
+    const vals=Object.values(this.moods);const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+    const dist=[5,4,3,2,1].map(n=>{const c=vals.filter(v=>v===n).length;return{emoji:me[n],pct:vals.length?Math.round(c/vals.length*100):0,w:(vals.length?c/vals.length*100:0)+'%',color:mc[n]};});
+    return{
+      moodWeek:week,
+      moodAvgEmoji:avg?me[Math.round(avg)]:'😐',
+      moodAvgLabel:avg?avg.toFixed(1)+' / 5 average':'No data yet',
+      moodDist:dist,
+      moodTracked:vals.length+' days',
+    };
+  }
+
+  // ---- focus ----
+  toggleTimer(){if(this.state.timerRun){clearInterval(this._iv);this.setState({timerRun:false});}else{this.setState({timerRun:true});this._iv=setInterval(()=>{this.setState(s=>{if(s.timer<=1){clearInterval(this._iv);return{timer:0,timerRun:false};}return{timer:s.timer-1};});},1000);}}
+  resetTimer(){clearInterval(this._iv);this.setState(s=>({timer:s.timerMin*60,timerTotal:s.timerMin*60,timerRun:false}));}
+  setPreset(min){clearInterval(this._iv);this.setState({timerMin:min,timer:min*60,timerTotal:min*60,timerRun:false});}
+  focusVals(){
+    const s=this.state;const mm=Math.floor(s.timer/60),ss=s.timer%60;
+    const pct=s.timerTotal?1-s.timer/s.timerTotal:0;
+    const amb=[['Rain','🌧️'],['Forest','🌲'],['Waves','🌊'],['Cafe','☕']];
+    return{
+      timerLabel:this.pad(mm)+':'+this.pad(ss),
+      timerRingOff:691.2*(1-pct),
+      timerBtnLabel:s.timerRun?'Pause':(s.timer<s.timerTotal?'Resume':'Start Focus'),
+      timerBtnStyle:{background:s.timerRun?'var(--pill)':'linear-gradient(135deg,var(--acc),#FFB23E)',color:s.timerRun?'var(--text)':'#fff',fontSize:'17px',fontWeight:'750',padding:'16px 0',borderRadius:'17px',textAlign:'center',cursor:'pointer',boxShadow:s.timerRun?'none':'0 8px 20px color-mix(in srgb,var(--acc) 38%,transparent)',flex:1},
+      toggleTimer:()=>this.toggleTimer(),
+      resetTimer:()=>this.resetTimer(),
+      presets:[25,45,15,5].map(m=>({label:m+'m',sel:s.timerMin===m,pick:()=>this.setPreset(m),style:{flex:1,textAlign:'center',padding:'10px 0',borderRadius:'12px',fontSize:'14px',fontWeight:'700',cursor:'pointer',background:s.timerMin===m?'var(--card)':'transparent',color:s.timerMin===m?'var(--acc)':'var(--sub)',boxShadow:s.timerMin===m?'var(--elev)':'none'}})),
+      ambient:amb.map(a=>({name:a[0],emoji:a[1],on:s.ambient[a[0]],toggle:()=>this.setState(p=>({ambient:{...p.ambient,[a[0]]:!p.ambient[a[0]]}})),style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',flex:1,padding:'14px 0',borderRadius:'16px',cursor:'pointer',background:s.ambient[a[0]]?'color-mix(in srgb,var(--acc) 14%,var(--card))':'var(--card)',border:s.ambient[a[0]]?'1.5px solid var(--acc)':'1.5px solid var(--sep)',color:s.ambient[a[0]]?'var(--acc)':'var(--sub)'}})),
+    };
+  }
+
+  // ---- create ----
+  setDraft(patch){this.setState(s=>({draft:{...s.draft,...patch}}));}
+  saveHabit(){const d=this.state.draft;if(!d||!d.name.trim())return;const id='h'+Date.now();const goal=d.goalType==='measure'?{type:'measure',target:+d.target||1,unit:d.unit||'times',step:+d.step||1}:{type:'check'};const sm={daily:{type:'daily'},weekdays:{type:'week',days:[1,2,3,4,5]},weekends:{type:'week',days:[0,6]},'3week':{type:'week',days:[1,3,5]}};this.habits.push({id,name:d.name.trim(),icon:d.icon,color:d.color,cat:'Custom',type:d.type,sched:sm[d.sched]||{type:'daily'},goal,rel:0});this.logs[id]={};this.setState({view:null,tab:'today',draft:null});}
+  createVals(){
+    const d=this.state.draft;if(!d)return{};
+    const icons=['⭐','💧','🏃','📖','🧘','💊','🌙','🍎','💪','🎸','✍️','🧹','🚭','🍩','☕','🦷','🚶','🎨','💰','🌿'];
+    const pal=Object.values(this.P);
+    return{
+      drName:d.name,drIcon:d.icon,
+      drPreviewCvar:{'--c':d.color,height:'100%',display:'flex',flexDirection:'column',minHeight:0},
+      drNameLabel:d.name||'New Habit',
+      setName:(e)=>this.setDraft({name:e.target.value}),
+      iconOptions:icons.map(ic=>({ic,pick:()=>this.setDraft({icon:ic}),style:{width:'46px',height:'46px',borderRadius:'13px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',cursor:'pointer',flex:'none',background:d.icon===ic?'color-mix(in srgb,var(--c) 18%,var(--card))':'var(--pill)',border:d.icon===ic?'2px solid var(--c)':'2px solid transparent'}})),
+      colorOptions:pal.map(c=>({pick:()=>this.setDraft({color:c}),style:{width:'34px',height:'34px',borderRadius:'50%',cursor:'pointer',flex:'none',background:c,border:d.color===c?'3px solid var(--text)':'3px solid transparent',transform:d.color===c?'scale(1.1)':'scale(1)',transition:'transform .15s'}})),
+      typeBuild:{onClick:()=>this.setDraft({type:'build'})},typeQuit:{onClick:()=>this.setDraft({type:'quit'})},
+      pickBuild:()=>this.setDraft({type:'build'}),pickQuit:()=>this.setDraft({type:'quit'}),
+      buildStyle:this.segStyle(d.type==='build'),quitStyle:this.segStyle(d.type==='quit'),
+      pickCheck:()=>this.setDraft({goalType:'check'}),pickMeasure:()=>this.setDraft({goalType:'measure'}),
+      checkStyle:this.segStyle(d.goalType==='check'),measureStyle:this.segStyle(d.goalType==='measure'),
+      isMeasure:d.goalType==='measure',
+      drTarget:String(d.target),drUnit:d.unit,
+      setTarget:(e)=>this.setDraft({target:e.target.value}),
+      setUnit:(e)=>this.setDraft({unit:e.target.value}),
+      schedOptions:[['daily','Every day'],['weekdays','Weekdays'],['weekends','Weekends'],['3week','3× / week']].map(o=>({label:o[1],sel:d.sched===o[0],pick:()=>this.setDraft({sched:o[0]}),style:{padding:'9px 15px',borderRadius:'13px',fontSize:'14px',fontWeight:'650',cursor:'pointer',flex:'none',background:d.sched===o[0]?'var(--c)':'var(--pill)',color:d.sched===o[0]?'#fff':'var(--sub)'}})),
+      canSave:!!d.name.trim(),
+      saveStyle:{background:d.name.trim()?'linear-gradient(135deg,var(--acc),#FFB23E)':'var(--pill)',color:d.name.trim()?'#fff':'var(--faint)',fontSize:'17px',fontWeight:'750',textAlign:'center',padding:'17px',borderRadius:'18px',cursor:d.name.trim()?'pointer':'default',boxShadow:d.name.trim()?'0 10px 22px color-mix(in srgb,var(--acc) 36%,transparent)':'none'},
+      saveHabit:()=>this.saveHabit(),
+    };
+  }
+  segStyle(active){return{flex:1,textAlign:'center',padding:'12px 0',borderRadius:'13px',fontSize:'14.5px',fontWeight:'700',cursor:'pointer',background:active?'var(--card)':'transparent',color:active?'var(--acc)':'var(--sub)',boxShadow:active?'var(--elev)':'none',transition:'all .2s'};}
+
+  screenVals(){
+    const s=this.state;
+    return{
+      isStats:s.view===null&&s.tab==='stats',
+      isMood:s.view===null&&s.tab==='mood',
+      isFocus:s.view===null&&s.tab==='focus',
+      isDetail:s.view==='detail',
+      isCreate:s.view==='create',
+      back:()=>this.setState({view:null}),
+      overlayStyle:{position:'absolute',inset:0,zIndex:40,background:'var(--bg)',color:'var(--text)',display:'flex',flexDirection:'column',...this.themeVars(),fontFamily:'-apple-system, system-ui, sans-serif'},
+      openDetailFns:{},
+      ...this.detailVals(),
+      ...this.statsVals(),
+      ...this.moodVals(),
+      ...this.focusVals(),
+      ...this.createVals(),
+    };
+  }
+}
+</script>
+</body>
+</html>

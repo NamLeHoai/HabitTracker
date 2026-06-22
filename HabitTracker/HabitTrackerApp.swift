@@ -10,23 +10,31 @@ import SwiftData
 
 @main
 struct HabitTrackerApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    let container: ModelContainer
+    @State private var store: HabitStore
+    @State private var theme = ThemeManager()
 
+    init() {
+        let schema = Schema([Habit.self, HabitLog.self, MoodEntry.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let created: ModelContainer
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            created = try ModelContainer(for: schema, configurations: [configuration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
-    }()
+        container = created
+        _store = State(initialValue: HabitStore(context: created.mainContext))
+    }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environment(store)
+                .environment(theme)
+                .preferredColorScheme(theme.isDark ? .dark : .light)
+                .task { store.loadAndSeedIfNeeded() }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(container)
     }
 }
