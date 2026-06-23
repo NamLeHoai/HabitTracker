@@ -1,18 +1,13 @@
 //
-//  SharedSnapshot.swift
-//  HabitTrackerWidget
+//  HabitSnapshot.swift
+//  HabitTracker
 //
-//  The widget's self-contained copy of the snapshot types. The app writes today-snapshot.json
-//  into the shared App Group container on every change; the widget only decodes it here, so the
-//  extension never compiles the SwiftData / derivation stack. Keep the Codable shape identical to
-//  HabitTracker/Core/HabitSnapshot.swift.
+//  A lightweight, Codable view of "today" that the app writes to the shared App Group container
+//  on every recompute, and that the widget reads for fast, allocation-free rendering. This file
+//  lives in the Shared module so both the app and the widget extension compile the same types.
 //
 
 import Foundation
-
-enum AppGroup {
-    static let id = "group.com.namle.HabitTracker"
-}
 
 struct HabitSnapshot: Codable {
     struct Item: Codable, Identifiable {
@@ -55,6 +50,13 @@ enum SnapshotStore {
             .appendingPathComponent(filename)
     }
 
+    /// Writer (app side). No-ops if the App Group container isn't reachable yet.
+    static func write(_ snapshot: HabitSnapshot) {
+        guard let url = url(), let data = try? JSONEncoder().encode(snapshot) else { return }
+        try? data.write(to: url, options: .atomic)
+    }
+
+    /// Reader (used by the app for previews / the widget has its own copy).
     static func read() -> HabitSnapshot {
         guard let url = url(),
               let data = try? Data(contentsOf: url),

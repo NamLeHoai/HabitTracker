@@ -124,9 +124,12 @@ struct HabitWidgetView: View {
                             Text(item.name).font(.system(size: 13, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white).lineLimit(1)
                             Spacer(minLength: 2)
-                            Image(systemName: item.done ? "checkmark.circle.fill" : "circle")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(.white.opacity(item.done ? 1 : 0.5))
+                            Button(intent: ToggleHabitIntent(habitID: item.id)) {
+                                Image(systemName: item.done ? "checkmark.circle.fill" : "circle")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundStyle(.white.opacity(item.done ? 1 : 0.55))
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }

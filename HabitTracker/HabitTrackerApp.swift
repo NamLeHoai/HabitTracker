@@ -13,14 +13,12 @@ struct HabitTrackerApp: App {
     let container: ModelContainer
     @State private var store: HabitStore
     @State private var theme = ThemeManager()
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
-        let schema = Schema([Habit.self, HabitLog.self, MoodEntry.self])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false,
-                                               groupContainer: .identifier(AppGroup.id))
         let created: ModelContainer
         do {
-            created = try ModelContainer(for: schema, configurations: [configuration])
+            created = try SharedStore.container()
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -28,13 +26,27 @@ struct HabitTrackerApp: App {
         _store = State(initialValue: HabitStore(context: created.mainContext))
     }
 
+    /// True when hosted by the XCTest runner. Unit tests drive their own in-memory stores, so the
+    /// app must stay quiescent — otherwise its SwiftUI/SwiftData work races the tests' model access.
+    private var isRunningTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environment(store)
-                .environment(theme)
-                .preferredColorScheme(theme.isDark ? .dark : .light)
-                .task { store.loadAndSeedIfNeeded() }
+            if isRunningTests {
+                Color.clear
+            } else {
+                RootView()
+                    .environment(store)
+                    .environment(theme)
+                    .preferredColorScheme(theme.isDark ? .dark : .light)
+                    .task { store.loadAndSeedIfNeeded() }
+                    .onChange(of: scenePhase) { _, phase in
+                        // Pick up changes made from the widget (interactive toggles) on foreground.
+                        if phase == .active { store.load() }
+                    }
+            }
         }
         .modelContainer(container)
     }
