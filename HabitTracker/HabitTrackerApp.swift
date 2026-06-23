@@ -16,7 +16,8 @@ struct HabitTrackerApp: App {
 
     init() {
         let schema = Schema([Habit.self, HabitLog.self, MoodEntry.self])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false,
+                                               groupContainer: .identifier(AppGroup.id))
         let created: ModelContainer
         do {
             created = try ModelContainer(for: schema, configurations: [configuration])

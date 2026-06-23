@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D1A6000000000000000000B2 /* HabitTrackerWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D1A6000000000000000000A1 /* HabitTrackerWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		FA4E1E792FE7FFE000D3431E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +25,32 @@
 			remoteGlobalIDString = FA4E1E682FE7FFDE00D3431E;
 			remoteInfo = HabitTracker;
 		};
+		D1A6000000000000000000B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA4E1E612FE7FFDE00D3431E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1A6000000000000000000A3;
+			remoteInfo = HabitTrackerWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		FA4E1E692FE7FFDE00D3431E /* HabitTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HabitTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4E1E782FE7FFE000D3431E /* HabitTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HabitTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4E1E822FE7FFE000D3431E /* HabitTrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HabitTrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1A6000000000000000000A1 /* HabitTrackerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HabitTrackerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D1A6000000000000000000C1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				HabitTrackerWidget.entitlements,
+			);
+			target = D1A6000000000000000000A3 /* HabitTrackerWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FA4E1E6B2FE7FFDE00D3431E /* HabitTracker */ = {
@@ -45,9 +68,38 @@
 			path = HabitTrackerUITests;
 			sourceTree = "<group>";
 		};
+		D1A6000000000000000000A2 /* HabitTrackerWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D1A6000000000000000000C1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = HabitTrackerWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D1A6000000000000000000B1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D1A6000000000000000000B2 /* HabitTrackerWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		D1A6000000000000000000A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FA4E1E662FE7FFDE00D3431E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -78,6 +130,7 @@
 				FA4E1E6B2FE7FFDE00D3431E /* HabitTracker */,
 				FA4E1E7B2FE7FFE000D3431E /* HabitTrackerTests */,
 				FA4E1E852FE7FFE000D3431E /* HabitTrackerUITests */,
+				D1A6000000000000000000A2 /* HabitTrackerWidget */,
 				FA4E1E6A2FE7FFDE00D3431E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +141,7 @@
 				FA4E1E692FE7FFDE00D3431E /* HabitTracker.app */,
 				FA4E1E782FE7FFE000D3431E /* HabitTrackerTests.xctest */,
 				FA4E1E822FE7FFE000D3431E /* HabitTrackerUITests.xctest */,
+				D1A6000000000000000000A1 /* HabitTrackerWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,10 +156,12 @@
 				FA4E1E652FE7FFDE00D3431E /* Sources */,
 				FA4E1E662FE7FFDE00D3431E /* Frameworks */,
 				FA4E1E672FE7FFDE00D3431E /* Resources */,
+				D1A6000000000000000000B1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D1A6000000000000000000B3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FA4E1E6B2FE7FFDE00D3431E /* HabitTracker */,
@@ -163,6 +219,28 @@
 			productReference = FA4E1E822FE7FFE000D3431E /* HabitTrackerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		D1A6000000000000000000A3 /* HabitTrackerWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1A6000000000000000000A7 /* Build configuration list for PBXNativeTarget "HabitTrackerWidget" */;
+			buildPhases = (
+				D1A6000000000000000000A4 /* Sources */,
+				D1A6000000000000000000A5 /* Frameworks */,
+				D1A6000000000000000000A6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D1A6000000000000000000A2 /* HabitTrackerWidget */,
+			);
+			name = HabitTrackerWidget;
+			packageProductDependencies = (
+			);
+			productName = HabitTrackerWidget;
+			productReference = D1A6000000000000000000A1 /* HabitTrackerWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +262,9 @@
 						CreatedOnToolsVersion = 26.5;
 						TestTargetID = FA4E1E682FE7FFDE00D3431E;
 					};
+					D1A6000000000000000000A3 = {
+						CreatedOnToolsVersion = 26.5;
+					};
 				};
 			};
 			buildConfigurationList = FA4E1E642FE7FFDE00D3431E /* Build configuration list for PBXProject "HabitTracker" */;
@@ -203,6 +284,7 @@
 				FA4E1E682FE7FFDE00D3431E /* HabitTracker */,
 				FA4E1E772FE7FFE000D3431E /* HabitTrackerTests */,
 				FA4E1E812FE7FFE000D3431E /* HabitTrackerUITests */,
+				D1A6000000000000000000A3 /* HabitTrackerWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +305,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA4E1E802FE7FFE000D3431E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1A6000000000000000000A6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +342,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1A6000000000000000000A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +361,11 @@
 			isa = PBXTargetDependency;
 			target = FA4E1E682FE7FFDE00D3431E /* HabitTracker */;
 			targetProxy = FA4E1E832FE7FFE000D3431E /* PBXContainerItemProxy */;
+		};
+		D1A6000000000000000000B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1A6000000000000000000A3 /* HabitTrackerWidget */;
+			targetProxy = D1A6000000000000000000B4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,6 +496,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HabitTracker/HabitTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 74DJ25NAZW;
@@ -427,6 +529,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HabitTracker/HabitTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 74DJ25NAZW;
@@ -538,6 +641,56 @@
 			};
 			name = Release;
 		};
+		D1A6000000000000000000A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HabitTrackerWidget/HabitTrackerWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 74DJ25NAZW;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = HabitTrackerWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.namle.HabitTracker.HabitTrackerWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D1A6000000000000000000A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HabitTrackerWidget/HabitTrackerWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 74DJ25NAZW;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = HabitTrackerWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.namle.HabitTracker.HabitTrackerWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -573,6 +726,15 @@
 			buildConfigurations = (
 				FA4E1E932FE7FFE000D3431E /* Debug */,
 				FA4E1E942FE7FFE000D3431E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1A6000000000000000000A7 /* Build configuration list for PBXNativeTarget "HabitTrackerWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1A6000000000000000000A8 /* Debug */,
+				D1A6000000000000000000A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

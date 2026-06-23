@@ -10,6 +10,7 @@
 import Foundation
 import SwiftData
 import Observation
+import WidgetKit
 
 @Observable
 final class HabitStore {
@@ -36,9 +37,10 @@ final class HabitStore {
 
     func loadAndSeedIfNeeded() {
         load()
-        if habits.isEmpty && !UserDefaults.standard.bool(forKey: "didSeed") {
+        let defaults = AppGroup.defaults
+        if habits.isEmpty && !defaults.bool(forKey: "didSeed") {
             SeedData.seed(into: context)
-            UserDefaults.standard.set(true, forKey: "didSeed")
+            defaults.set(true, forKey: "didSeed")
             load()
         }
     }
@@ -221,5 +223,34 @@ final class HabitStore {
         g.weeklyTrend = HabitDerivations.weeklyTrend(items, weeks: 8, today: t)
         g.aggregateHeat = HabitDerivations.heatGrid(items: items, spec: nil, logs: nil, today: t)
         global = g
+
+        writeSnapshot()
+    }
+
+    /// Publish a lightweight "today" snapshot to the shared App Group and refresh widgets.
+    /// Runs after every load/mutation (via `recompute`). No-ops gracefully until the App Group
+    /// container is reachable.
+    private func writeSnapshot() {
+        let d = today
+        let items = habits
+            .filter { HabitDerivations.isScheduled($0.spec, on: d) }
+            .map { habit -> HabitSnapshot.Item in
+                let v = value(habit, on: d)
+                let done = isDone(habit, on: d)
+                let progress: Double
+                switch habit.goal {
+                case .check: progress = done ? 1 : 0
+                case .measure(let target, _): progress = target > 0 ? min(1, Double(v) / Double(target)) : 0
+                }
+                return HabitSnapshot.Item(id: habit.id, icon: habit.icon, name: habit.name,
+                                          colorHex: habit.colorHex, done: done, progress: progress)
+            }
+        let snapshot = HabitSnapshot(dayKey: DayKey.key(d),
+                                     doneCount: items.filter(\.done).count,
+                                     total: items.count,
+                                     bestStreak: global.bestStreak,
+                                     items: items)
+        SnapshotStore.write(snapshot)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
