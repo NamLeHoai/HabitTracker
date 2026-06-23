@@ -10,14 +10,52 @@ struct CreateHabitView: View {
     @Environment(\.theme) private var t
     @Environment(\.dismiss) private var dismiss
 
-    @State private var name = ""
-    @State private var icon = "⭐"
-    @State private var colorHex = Palette.coral
-    @State private var kind: HabitKind = .build
-    @State private var goalMeasure = false
-    @State private var target = "8"
-    @State private var unit = ""
-    @State private var sched = "daily"
+    /// nil = create a new habit; non-nil = edit this existing habit in place.
+    private let editing: Habit?
+
+    @State private var name: String
+    @State private var icon: String
+    @State private var colorHex: String
+    @State private var kind: HabitKind
+    @State private var goalMeasure: Bool
+    @State private var target: String
+    @State private var unit: String
+    @State private var sched: String
+    @State private var reminderOn: Bool
+    @State private var reminderTime: Date
+
+    init(editing: Habit? = nil) {
+        self.editing = editing
+        _name = State(initialValue: editing?.name ?? "")
+        _icon = State(initialValue: editing?.icon ?? "⭐")
+        _colorHex = State(initialValue: editing?.colorHex ?? Palette.coral)
+        _kind = State(initialValue: editing?.kind ?? .build)
+        _goalMeasure = State(initialValue: editing?.goal.isMeasure ?? false)
+        _target = State(initialValue: editing.flatMap { $0.target > 0 ? "\($0.target)" : nil } ?? "8")
+        _unit = State(initialValue: editing?.unit ?? "")
+        _sched = State(initialValue: CreateHabitView.schedKey(for: editing?.schedule))
+        _reminderOn = State(initialValue: editing?.reminderEnabled ?? false)
+        _reminderTime = State(initialValue: CreateHabitView.dateAt(
+            hour: editing?.reminderHour ?? 9, minute: editing?.reminderMinute ?? 0))
+    }
+
+    private static func schedKey(for schedule: Schedule?) -> String {
+        guard let schedule else { return "daily" }
+        switch schedule {
+        case .daily: return "daily"
+        case .week(let days):
+            switch Set(days) {
+            case [1, 2, 3, 4, 5]: return "weekdays"
+            case [0, 6]: return "weekends"
+            case [1, 3, 5]: return "3week"
+            default: return "daily"
+            }
+        }
+    }
+
+    private static func dateAt(hour: Int, minute: Int) -> Date {
+        Calendar.current.date(bySettingHour: max(0, hour), minute: max(0, minute), second: 0, of: Date()) ?? Date()
+    }
 
     private let icons = ["⭐", "💧", "🏃", "📖", "🧘", "💊", "🌙", "🍎", "💪", "🎸",
                          "✍️", "🧹", "🚭", "🍩", "☕", "🦷", "🚶", "🎨", "💰", "🌿"]
@@ -32,7 +70,7 @@ struct CreateHabitView: View {
             HStack {
                 Button("Cancel") { dismiss() }.foregroundStyle(t.sub).font(.system(size: 16, weight: .semibold))
                 Spacer()
-                Text("New Habit").font(.system(size: 17, weight: .bold, design: .rounded))
+                Text(editing == nil ? "New Habit" : "Edit Habit").font(.system(size: 17, weight: .bold, design: .rounded))
                 Spacer()
                 Color.clear.frame(width: 52)
             }
@@ -99,8 +137,26 @@ struct CreateHabitView: View {
                     label("SCHEDULE")
                     FlowChips(items: schedules, selected: sched) { sched = $0 }
 
+                    label("REMINDER")
+                    VStack(spacing: 12) {
+                        Toggle(isOn: $reminderOn) {
+                            Text("Daily reminder").font(.system(size: 15.5, weight: .semibold))
+                        }
+                        .tint(color)
+                        if reminderOn {
+                            Divider().overlay(t.sep)
+                            DatePicker("Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                                .font(.system(size: 15, weight: .semibold))
+                        }
+                    }
+                    .padding(15)
+                    .glassCard(cornerRadius: 15)
+                    .onChange(of: reminderOn) { _, on in
+                        if on { Task { await NotificationManager.requestAuthorization() } }
+                    }
+
                     Button(action: save) {
-                        Text("Create Habit").font(.system(size: 17, weight: .bold))
+                        Text(editing == nil ? "Create Habit" : "Save Changes").font(.system(size: 17, weight: .bold))
                             .foregroundStyle(canSave ? .white : t.faint)
                             .frame(maxWidth: .infinity).padding(.vertical, 17)
                             .background(
@@ -161,8 +217,18 @@ struct CreateHabitView: View {
         let goal: Goal = goalMeasure
             ? .measure(target: max(1, Int(target) ?? 1), step: 1)
             : .check
-        store.createHabit(name: trimmed, icon: icon, colorHex: colorHex, kind: kind,
-                          schedule: schedule, goal: goal, unit: goalMeasure ? unit : "")
+        let comps = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
+        let rHour = comps.hour ?? 9
+        let rMinute = comps.minute ?? 0
+        if let editing {
+            store.updateHabit(editing, name: trimmed, icon: icon, colorHex: colorHex, kind: kind,
+                              schedule: schedule, goal: goal, unit: goalMeasure ? unit : "",
+                              reminderEnabled: reminderOn, reminderHour: rHour, reminderMinute: rMinute)
+        } else {
+            store.createHabit(name: trimmed, icon: icon, colorHex: colorHex, kind: kind,
+                              schedule: schedule, goal: goal, unit: goalMeasure ? unit : "",
+                              reminderEnabled: reminderOn, reminderHour: rHour, reminderMinute: rMinute)
+        }
         dismiss()
     }
 }

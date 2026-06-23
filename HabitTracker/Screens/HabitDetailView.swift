@@ -17,6 +17,7 @@ struct HabitDetailView: View {
     @State private var calCells: [CalCell] = []
     @State private var heat: [[Int]] = []
     @State private var confirmDelete = false
+    @State private var showEdit = false
 
     private var color: Color { Color(hex: habit.colorHex) }
 
@@ -49,6 +50,12 @@ struct HabitDetailView: View {
         } message: {
             Text("This removes “\(habit.name)” and all its history.")
         }
+        .sheet(isPresented: $showEdit, onDismiss: rebuild) {
+            CreateHabitView(editing: habit)
+                .environment(store)
+                .environment(\.theme, t)
+                .presentationDragIndicator(.visible)
+        }
     }
 
     private var topBar: some View {
@@ -56,6 +63,9 @@ struct HabitDetailView: View {
             circleButton("chevron.left") { dismiss() }
             Spacer()
             Menu {
+                Button { showEdit = true } label: {
+                    Label("Edit Habit", systemImage: "pencil")
+                }
                 Button(role: .destructive) { confirmDelete = true } label: {
                     Label("Delete Habit", systemImage: "trash")
                 }

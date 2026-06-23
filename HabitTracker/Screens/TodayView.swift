@@ -14,8 +14,15 @@ struct TodayView: View {
     @Environment(ThemeManager.self) private var theme
     @Environment(\.theme) private var t
     @AppStorage("layoutB") private var layoutB = false
+    @State private var toggleTick = 0
 
     private var habits: [Habit] { store.todayHabits }
+
+    /// Toggle today's completion and fire a success haptic.
+    private func toggle(_ habit: Habit) {
+        store.toggleToday(habit)
+        toggleTick += 1
+    }
     private var doneCount: Int { habits.filter { store.isDone($0, on: store.today) }.count }
     private var total: Int { habits.count }
     private var pct: Double { total > 0 ? Double(doneCount) / Double(total) : 0 }
@@ -32,6 +39,7 @@ struct TodayView: View {
                 .padding(.bottom, 120)
             }
         }
+        .sensoryFeedback(.success, trigger: toggleTick)
     }
 
     // MARK: Header
@@ -153,7 +161,7 @@ struct TodayView: View {
                 }
             }
             Spacer(minLength: 8)
-            Button { store.toggleToday(habit) } label: {
+            Button { toggle(habit) } label: {
                 ZStack {
                     MiniRing(progress: p, color: color, trackColor: color.opacity(0.17))
                     Text(done ? "✓" : (habit.goal.isMeasure && v > 0 ? "\(v)" : ""))
@@ -234,7 +242,7 @@ struct TodayView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(done ? .white : t.text)
 
-        return Button { store.toggleToday(habit) } label: {
+        return Button { toggle(habit) } label: {
             if done {
                 inner
                     .background(Brand.sweep(color), in: RoundedRectangle(cornerRadius: 20, style: .continuous))

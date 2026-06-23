@@ -26,6 +26,11 @@ final class Habit {
     var sortOrder: Int = 0
     var createdAt: Date = Date()
 
+    // Reminder (local notification). Hour/minute are local time-of-day; -1 hour means unset.
+    var reminderEnabled: Bool = false
+    var reminderHour: Int = 9
+    var reminderMinute: Int = 0
+
     @Relationship(deleteRule: .cascade, inverse: \HabitLog.habit)
     var logs: [HabitLog]? = []
 
@@ -39,7 +44,10 @@ final class Habit {
          goal: Goal,
          unit: String = "",
          sortOrder: Int = 0,
-         createdAt: Date = Date()) {
+         createdAt: Date = Date(),
+         reminderEnabled: Bool = false,
+         reminderHour: Int = 9,
+         reminderMinute: Int = 0) {
         self.id = id
         self.name = name
         self.icon = icon
@@ -67,6 +75,9 @@ final class Habit {
         self.unit = unit
         self.sortOrder = sortOrder
         self.createdAt = createdAt
+        self.reminderEnabled = reminderEnabled
+        self.reminderHour = reminderHour
+        self.reminderMinute = reminderMinute
     }
 
     var kind: HabitKind { HabitKind(rawValue: kindRaw) ?? .build }

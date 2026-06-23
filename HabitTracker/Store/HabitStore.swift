@@ -121,16 +121,46 @@ final class HabitStore {
     }
 
     func createHabit(name: String, icon: String, colorHex: String, kind: HabitKind,
-                     schedule: Schedule, goal: Goal, unit: String) {
+                     schedule: Schedule, goal: Goal, unit: String,
+                     reminderEnabled: Bool = false, reminderHour: Int = 9, reminderMinute: Int = 0) {
         let order = (habits.map(\.sortOrder).max() ?? 0) + 1
         let habit = Habit(name: name, icon: icon, colorHex: colorHex, kind: kind,
-                          schedule: schedule, goal: goal, unit: unit, sortOrder: order)
+                          schedule: schedule, goal: goal, unit: unit, sortOrder: order,
+                          reminderEnabled: reminderEnabled, reminderHour: reminderHour, reminderMinute: reminderMinute)
         context.insert(habit)
         try? context.save()
+        NotificationManager.reschedule(for: habit)
+        load()
+    }
+
+    /// Edit an existing habit in place, then reschedule its reminder. Mirrors the field mapping in `Habit.init`.
+    func updateHabit(_ habit: Habit, name: String, icon: String, colorHex: String, kind: HabitKind,
+                     schedule: Schedule, goal: Goal, unit: String,
+                     reminderEnabled: Bool, reminderHour: Int, reminderMinute: Int) {
+        habit.name = name
+        habit.icon = icon
+        habit.colorHex = colorHex
+        habit.kindRaw = kind.rawValue
+        switch schedule {
+        case .daily: habit.schedTypeRaw = "daily"; habit.schedDays = []
+        case .week(let days): habit.schedTypeRaw = "week"; habit.schedDays = days
+        }
+        switch goal {
+        case .check: habit.goalTypeRaw = GoalKind.check.rawValue; habit.target = 0; habit.step = 1
+        case .measure(let target, let step):
+            habit.goalTypeRaw = GoalKind.measure.rawValue; habit.target = target; habit.step = step
+        }
+        habit.unit = unit
+        habit.reminderEnabled = reminderEnabled
+        habit.reminderHour = reminderHour
+        habit.reminderMinute = reminderMinute
+        try? context.save()
+        NotificationManager.reschedule(for: habit)
         load()
     }
 
     func deleteHabit(_ habit: Habit) {
+        NotificationManager.cancel(habitID: habit.id)
         context.delete(habit)   // cascade-deletes logs
         try? context.save()
         load()
