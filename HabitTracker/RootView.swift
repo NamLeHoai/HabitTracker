@@ -23,7 +23,7 @@ struct RootView: View {
 
     var body: some View {
         ZStack {
-            t.bg.ignoresSafeArea()
+            AmbientBackground()
 
             if !hasSeenOnboarding {
                 OnboardingView { hasSeenOnboarding = true }
@@ -71,33 +71,32 @@ private struct TabBar: View {
     @Environment(\.theme) private var t
 
     var body: some View {
-        HStack(spacing: 0) {
-            item(.today, "checklist", "Today")
-            item(.stats, "chart.bar.fill", "Stats")
+        GlassEffectContainer(spacing: 22) {
+            HStack(spacing: 0) {
+                item(.today, "checklist", "Today")
+                item(.stats, "chart.bar.fill", "Stats")
 
-            Button(action: onCreate) {
-                Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 54, height: 54)
-                    .background(
-                        LinearGradient(colors: [t.acc, Color(hex: "#FFB23E")],
-                                       startPoint: .topLeading, endPoint: .bottomTrailing),
-                        in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    )
-                    .shadow(color: t.acc.opacity(0.45), radius: 9, y: 8)
+                Button(action: onCreate) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 56, height: 56)
+                        .background(Brand.iridescent(t), in: Circle())
+                        .overlay(Circle().stroke(.white.opacity(0.3), lineWidth: 1))
+                        .shadow(color: t.acc.opacity(0.5), radius: 12, y: 8)
+                }
+                .offset(y: -20)
+                .frame(maxWidth: .infinity)
+
+                item(.mood, "face.smiling.fill", "Mood")
+                item(.focus, "timer", "Focus")
             }
-            .offset(y: -18)
-            .frame(maxWidth: .infinity)
-
-            item(.mood, "face.smiling.fill", "Mood")
-            item(.focus, "timer", "Focus")
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).stroke(t.glassStroke, lineWidth: 1))
+            .shadow(color: t.shadow, radius: 16, y: 8)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(t.nav, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(t.sep, lineWidth: 1))
-        .shadow(color: t.shadow, radius: 12, y: 6)
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
     }

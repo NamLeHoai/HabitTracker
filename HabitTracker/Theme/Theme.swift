@@ -2,14 +2,16 @@
 //  Theme.swift
 //  HabitTracker
 //
-//  Light/dark token sets ported from the prototype's `themeVars()` (line 636), plus an
-//  @Observable manager that persists the choice. Nunito is substituted with the system
-//  rounded font (no bundled font files).
+//  Light/dark token sets, reworked for the iOS 26 Liquid Glass redesign. The palette is
+//  now cool and neutral so the system glass material has something to refract, with a
+//  purple/teal brand accent and an iridescent gradient used by hero surfaces. Nunito is
+//  substituted with the system rounded font (no bundled font files).
 //
 
 import SwiftUI
 
 struct ThemeTokens {
+    let isDark: Bool
     let bg: Color
     let bg2: Color
     let card: Color
@@ -18,36 +20,47 @@ struct ThemeTokens {
     let faint: Color
     let sep: Color
     let pill: Color
-    let acc: Color
+    let acc: Color          // primary brand (purple)
+    let acc2: Color         // secondary brand (teal)
     let nav: Color
     let shadow: Color
+    let glassStroke: Color   // bright rim on glass surfaces
+    let glassHighlight: Color // inner top highlight
 
     static let light = ThemeTokens(
-        bg: Color(hex: "#F4EEE6"),
-        bg2: Color(hex: "#EDE5D9"),
+        isDark: false,
+        bg: Color(hex: "#EBE9F2"),
+        bg2: Color(hex: "#E3E0EC"),
         card: Color(hex: "#FFFFFF"),
-        text: Color(hex: "#1D1A16"),
-        sub: Color(hex: "#8C8478"),
-        faint: Color(hex: "#BDB4A7"),
-        sep: Color(hex: "#281C0C").opacity(0.07),
-        pill: Color(hex: "#EBE3D8"),
-        acc: Color(hex: "#FF6B5E"),
-        nav: Color(hex: "#FFFFFF").opacity(0.92),
-        shadow: Color(hex: "#3C2C14").opacity(0.10)
+        text: Color(hex: "#1B1A22"),
+        sub: Color(hex: "#807C8C"),
+        faint: Color(hex: "#B7B3C4"),
+        sep: Color(hex: "#1A1430").opacity(0.07),
+        pill: Color(hex: "#E6E3EF"),
+        acc: Color(hex: "#7C5CFF"),
+        acc2: Color(hex: "#16C8B8"),
+        nav: Color(hex: "#FFFFFF").opacity(0.55),
+        shadow: Color(hex: "#2A2348").opacity(0.13),
+        glassStroke: Color(hex: "#FFFFFF").opacity(0.55),
+        glassHighlight: Color(hex: "#FFFFFF").opacity(0.65)
     )
 
     static let dark = ThemeTokens(
-        bg: Color(hex: "#141210"),
-        bg2: Color(hex: "#1D1916"),
-        card: Color(hex: "#221E19"),
-        text: Color(hex: "#F4EFE8"),
-        sub: Color(hex: "#9B9389"),
-        faint: Color(hex: "#6B6359"),
-        sep: Color(hex: "#FFFFFF").opacity(0.08),
-        pill: Color(hex: "#2A2521"),
-        acc: Color(hex: "#FF7A6B"),
-        nav: Color(hex: "#1A1613").opacity(0.92),
-        shadow: Color(hex: "#000000").opacity(0.40)
+        isDark: true,
+        bg: Color(hex: "#0E0D14"),
+        bg2: Color(hex: "#16141F"),
+        card: Color(hex: "#1C1A26"),
+        text: Color(hex: "#F2F0F8"),
+        sub: Color(hex: "#9A95A8"),
+        faint: Color(hex: "#5E5870"),
+        sep: Color(hex: "#FFFFFF").opacity(0.09),
+        pill: Color(hex: "#26222F"),
+        acc: Color(hex: "#9B82FF"),
+        acc2: Color(hex: "#2BD4C4"),
+        nav: Color(hex: "#1A1622").opacity(0.55),
+        shadow: Color(hex: "#000000").opacity(0.45),
+        glassStroke: Color(hex: "#FFFFFF").opacity(0.16),
+        glassHighlight: Color(hex: "#FFFFFF").opacity(0.22)
     )
 }
 

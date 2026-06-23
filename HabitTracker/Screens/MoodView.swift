@@ -21,8 +21,7 @@ struct MoodView: View {
                 Spacer()
                 Button { theme.toggle() } label: {
                     Text(theme.isDark ? "☀️" : "🌙").font(.system(size: 17))
-                        .frame(width: 38, height: 38).background(t.card, in: Circle())
-                        .shadow(color: t.shadow, radius: 8, y: 4)
+                        .glassChrome(diameter: 40)
                 }
             }
             .padding(.horizontal, 20).padding(.top, 62).padding(.bottom, 8)
@@ -62,7 +61,8 @@ struct MoodView: View {
                            startPoint: .topLeading, endPoint: .bottomTrailing),
             in: RoundedRectangle(cornerRadius: 24, style: .continuous)
         )
-        .shadow(color: Color(hex: "#1FC6B8").opacity(0.32), radius: 14, y: 12)
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(.white.opacity(0.25), lineWidth: 1))
+        .shadow(color: Color(hex: "#1FC6B8").opacity(0.34), radius: 16, y: 12)
     }
 
     private var weekCard: some View {
@@ -128,7 +128,6 @@ struct MoodView: View {
         content()
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(t.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .shadow(color: t.shadow, radius: 8, y: 4)
+            .glassCard(cornerRadius: 22)
     }
 }

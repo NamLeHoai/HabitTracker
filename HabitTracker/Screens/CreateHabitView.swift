@@ -43,8 +43,7 @@ struct CreateHabitView: View {
                     preview
                     label("NAME")
                     TextField("e.g. Drink water", text: $name)
-                        .padding(15).background(t.card, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(t.sep, lineWidth: 1.5))
+                        .padding(15).glassCard(cornerRadius: 15)
 
                     label("ICON")
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -85,15 +84,13 @@ struct CreateHabitView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Target").font(.system(size: 11.5, weight: .semibold)).foregroundStyle(t.sub)
                                 TextField("8", text: $target).keyboardType(.numberPad)
-                                    .padding(13).background(t.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(t.sep, lineWidth: 1.5))
+                                    .padding(13).glassCard(cornerRadius: 14)
                             }
                             .frame(width: 110)
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Unit").font(.system(size: 11.5, weight: .semibold)).foregroundStyle(t.sub)
                                 TextField("glasses", text: $unit)
-                                    .padding(13).background(t.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(t.sep, lineWidth: 1.5))
+                                    .padding(13).glassCard(cornerRadius: 14)
                             }
                         }
                         .padding(.top, 12)
@@ -108,11 +105,9 @@ struct CreateHabitView: View {
                             .frame(maxWidth: .infinity).padding(.vertical, 17)
                             .background(
                                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                    .fill(canSave
-                                          ? AnyShapeStyle(LinearGradient(colors: [t.acc, Color(hex: "#FFB23E")],
-                                                                         startPoint: .topLeading, endPoint: .bottomTrailing))
-                                          : AnyShapeStyle(t.pill))
+                                    .fill(canSave ? AnyShapeStyle(Brand.primary(t)) : AnyShapeStyle(t.pill))
                             )
+                            .shadow(color: canSave ? t.acc.opacity(0.4) : .clear, radius: 14, y: 9)
                     }
                     .buttonStyle(.plain)
                     .disabled(!canSave)
@@ -121,7 +116,7 @@ struct CreateHabitView: View {
                 .padding(.horizontal, 20).padding(.bottom, 40)
             }
         }
-        .background(t.bg.ignoresSafeArea())
+        .background(AmbientBackground())
     }
 
     private var preview: some View {

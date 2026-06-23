@@ -59,16 +59,10 @@ struct OnboardingView: View {
                 } label: {
                     Text(s.cta)
                         .font(.system(size: 17, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
-                        .background(
-                            LinearGradient(colors: [t.acc, Color(hex: "#FFB23E")],
-                                           startPoint: .topLeading, endPoint: .bottomTrailing),
-                            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        )
-                        .shadow(color: t.acc.opacity(0.4), radius: 11, y: 10)
                 }
+                .buttonStyle(.brand(Brand.iridescent(t)))
 
                 Button(action: onFinish) {
                     Text(step < 2 ? "Skip" : " ")
@@ -81,6 +75,6 @@ struct OnboardingView: View {
             .padding(.bottom, 46)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(t.bg.ignoresSafeArea())
+        .background(AmbientBackground())
     }
 }

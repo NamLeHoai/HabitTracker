@@ -41,7 +41,7 @@ struct HabitDetailView: View {
             .padding(.horizontal, 20).padding(.top, 12).padding(.bottom, 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(t.bg.ignoresSafeArea())
+        .background(AmbientBackground())
         .onAppear(perform: rebuild)
         .confirmationDialog("Delete this habit?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { store.deleteHabit(habit); dismiss() }
@@ -61,8 +61,8 @@ struct HabitDetailView: View {
                 }
             } label: {
                 Image(systemName: "ellipsis").font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(t.sub).frame(width: 40, height: 40)
-                    .background(t.card, in: Circle()).shadow(color: t.shadow, radius: 8, y: 4)
+                    .foregroundStyle(t.sub)
+                    .glassChrome(diameter: 40)
             }
         }
         .padding(.top, 8)
@@ -107,12 +107,9 @@ struct HabitDetailView: View {
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 22).padding(.vertical, 20)
-        .background(
-            LinearGradient(colors: [color, color.opacity(0.6)],
-                           startPoint: .topLeading, endPoint: .bottomTrailing),
-            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-        )
-        .shadow(color: color.opacity(0.38), radius: 13, y: 12)
+        .background(Brand.sweep(color), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(.white.opacity(0.25), lineWidth: 1))
+        .shadow(color: color.opacity(0.4), radius: 16, y: 12)
     }
 
     private func statTrio(_ s: HabitStats) -> some View {
@@ -129,8 +126,7 @@ struct HabitDetailView: View {
             Text(label).font(.system(size: 11.5, weight: .semibold)).foregroundStyle(t.sub)
         }
         .frame(maxWidth: .infinity).padding(.vertical, 14)
-        .background(t.card, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(color: t.shadow, radius: 8, y: 4)
+        .glassCard(cornerRadius: 16)
     }
 
     private var calendarCard: some View {
@@ -151,8 +147,7 @@ struct HabitDetailView: View {
             }
         }
         .padding(18).frame(maxWidth: .infinity, alignment: .leading)
-        .background(t.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .shadow(color: t.shadow, radius: 8, y: 4)
+        .glassCard(cornerRadius: 22)
     }
 
     private func calCellView(_ cell: CalCell) -> some View {
@@ -185,15 +180,13 @@ struct HabitDetailView: View {
             Heatmap(weeks: heat, color: color, pill: t.pill)
         }
         .padding(18).frame(maxWidth: .infinity, alignment: .leading)
-        .background(t.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .shadow(color: t.shadow, radius: 8, y: 4)
+        .glassCard(cornerRadius: 22)
     }
 
     private func circleButton(_ icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon).font(.system(size: 15, weight: .bold)).foregroundStyle(t.sub)
-                .frame(width: 40, height: 40).background(t.card, in: Circle())
-                .shadow(color: t.shadow, radius: 8, y: 4)
+                .glassChrome(diameter: 40)
         }
     }
 

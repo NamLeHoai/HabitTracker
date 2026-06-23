@@ -28,8 +28,7 @@ struct StatsView: View {
                 Spacer()
                 Button { theme.toggle() } label: {
                     Text(theme.isDark ? "☀️" : "🌙").font(.system(size: 17))
-                        .frame(width: 38, height: 38).background(t.card, in: Circle())
-                        .shadow(color: t.shadow, radius: 8, y: 4)
+                        .glassChrome(diameter: 40)
                 }
             }
             .padding(.horizontal, 20).padding(.top, 62).padding(.bottom, 8)
@@ -64,8 +63,7 @@ struct StatsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 17).padding(.vertical, 16)
-        .background(t.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: t.shadow, radius: 8, y: 4)
+        .glassCard(cornerRadius: 20)
     }
 
     private var activityCard: some View {
@@ -163,8 +161,7 @@ struct StatsView: View {
                         Text("🔥\(s.streak)").font(.system(size: 13, weight: .bold)).foregroundStyle(t.sub)
                     }
                     .padding(.horizontal, 15).padding(.vertical, 13)
-                    .background(t.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .shadow(color: t.shadow, radius: 8, y: 4)
+                    .glassCard(cornerRadius: 18)
                 }
                 .buttonStyle(.plain)
             }
@@ -175,7 +172,6 @@ struct StatsView: View {
         content()
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(t.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .shadow(color: t.shadow, radius: 8, y: 4)
+            .glassCard(cornerRadius: 22)
     }
 }

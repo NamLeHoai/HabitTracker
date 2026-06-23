@@ -83,8 +83,7 @@ struct FocusView: View {
                 Spacer()
                 Button { theme.toggle() } label: {
                     Text(theme.isDark ? "☀️" : "🌙").font(.system(size: 17))
-                        .frame(width: 38, height: 38).background(t.card, in: Circle())
-                        .shadow(color: t.shadow, radius: 8, y: 4)
+                        .glassChrome(diameter: 40)
                 }
             }
             .padding(.horizontal, 20).padding(.top, 62).padding(.bottom, 8)
@@ -123,8 +122,7 @@ struct FocusView: View {
                             Image(systemName: "arrow.counterclockwise")
                                 .font(.system(size: 20, weight: .semibold)).foregroundStyle(t.sub)
                                 .frame(width: 54, height: 54)
-                                .background(t.card, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
-                                .shadow(color: t.shadow, radius: 8, y: 4)
+                                .glassCard(cornerRadius: 17)
                         }
                         Button { timer.toggle() } label: {
                             Text(timer.buttonLabel)
@@ -135,9 +133,9 @@ struct FocusView: View {
                                     RoundedRectangle(cornerRadius: 17, style: .continuous)
                                         .fill(timer.running
                                               ? AnyShapeStyle(t.pill)
-                                              : AnyShapeStyle(LinearGradient(colors: [t.acc, Color(hex: "#FFB23E")],
-                                                                             startPoint: .topLeading, endPoint: .bottomTrailing)))
+                                              : AnyShapeStyle(Brand.primary(t)))
                                 )
+                                .shadow(color: timer.running ? .clear : t.acc.opacity(0.4), radius: 14, y: 9)
                         }
                         .buttonStyle(.plain)
                     }
@@ -153,15 +151,19 @@ struct FocusView: View {
                             Button {
                                 if on { ambient.remove(name) } else { ambient.insert(name) }
                             } label: {
-                                VStack(spacing: 6) {
+                                let chip = VStack(spacing: 6) {
                                     Text(emoji).font(.system(size: 24))
                                     Text(name).font(.system(size: 12, weight: .semibold))
                                 }
                                 .foregroundStyle(on ? t.acc : t.sub)
                                 .frame(maxWidth: .infinity).padding(.vertical, 14)
-                                .background(on ? t.acc.opacity(0.14) : t.card, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(on ? t.acc : t.sep, lineWidth: 1.5))
+                                if on {
+                                    chip
+                                        .background(t.acc.opacity(0.14), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(t.acc, lineWidth: 1.5))
+                                } else {
+                                    chip.glassCard(cornerRadius: 16)
+                                }
                             }
                             .buttonStyle(.plain)
                         }

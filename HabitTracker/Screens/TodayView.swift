@@ -64,9 +64,7 @@ struct TodayView: View {
 
                 Button { theme.toggle() } label: {
                     Text(theme.isDark ? "☀️" : "🌙").font(.system(size: 17))
-                        .frame(width: 38, height: 38)
-                        .background(t.card, in: Circle())
-                        .shadow(color: t.shadow, radius: 8, y: 4)
+                        .glassChrome(diameter: 40)
                 }
             }
         }
@@ -121,12 +119,9 @@ struct TodayView: View {
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 22).padding(.vertical, 20)
-        .background(
-            LinearGradient(colors: [t.acc, Color(hex: "#FF9D57")],
-                           startPoint: .topLeading, endPoint: .bottomTrailing),
-            in: RoundedRectangle(cornerRadius: 26, style: .continuous)
-        )
-        .shadow(color: t.acc.opacity(0.4), radius: 14, y: 12)
+        .background(Brand.iridescent(t), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(.white.opacity(0.25), lineWidth: 1))
+        .shadow(color: t.acc.opacity(0.4), radius: 16, y: 12)
     }
 
     private var dayMessage: String {
@@ -169,9 +164,8 @@ struct TodayView: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 16).padding(.vertical, 14)
-        .background(t.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(color.opacity(0.22), lineWidth: 1.5))
-        .shadow(color: t.shadow, radius: 8, y: 4)
+        .glassCard(cornerRadius: 22)
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(color.opacity(0.30), lineWidth: 1.5))
         .contentShape(Rectangle())
         .onTapGesture { openDetail(habit) }
     }
@@ -214,35 +208,43 @@ struct TodayView: View {
         let v = store.value(habit, on: store.today)
         let done = store.isDone(habit, on: store.today)
         let p = progress(habit, value: v)
-        return Button { store.toggleToday(habit) } label: {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .top) {
-                    Text(habit.icon).font(.system(size: 22))
-                        .frame(width: 42, height: 42)
-                        .background((done ? Color.white.opacity(0.22) : color.opacity(0.16)),
-                                    in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                    Spacer()
-                    Text(done ? "✓" : "")
-                        .font(.system(size: 15, weight: .heavy))
-                        .foregroundStyle(done ? .white : t.sub)
-                        .frame(width: 26, height: 26)
-                        .background((done ? Color.white.opacity(0.25) : t.pill), in: Circle())
-                }
-                Text(habit.name).font(.system(size: 15, weight: .bold)).padding(.top, 12)
-                Text(subtitle(habit, value: v, done: done))
-                    .font(.system(size: 12.5, weight: .semibold)).opacity(0.75).padding(.top, 2)
-                ProgressView(value: p)
-                    .tint(done ? .white : color)
-                    .background(done ? Color.white.opacity(0.25) : t.pill)
-                    .frame(height: 6).clipShape(Capsule())
-                    .padding(.top, 10)
+        let inner = VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top) {
+                Text(habit.icon).font(.system(size: 22))
+                    .frame(width: 42, height: 42)
+                    .background((done ? Color.white.opacity(0.22) : color.opacity(0.16)),
+                                in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                Spacer()
+                Text(done ? "✓" : "")
+                    .font(.system(size: 15, weight: .heavy))
+                    .foregroundStyle(done ? .white : t.sub)
+                    .frame(width: 26, height: 26)
+                    .background((done ? Color.white.opacity(0.25) : t.pill), in: Circle())
             }
-            .padding(15)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(done ? .white : t.text)
-            .background(done ? color : t.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(color.opacity(done ? 1 : 0.2), lineWidth: 1.5))
-            .shadow(color: t.shadow, radius: 8, y: 4)
+            Text(habit.name).font(.system(size: 15, weight: .bold)).padding(.top, 12)
+            Text(subtitle(habit, value: v, done: done))
+                .font(.system(size: 12.5, weight: .semibold)).opacity(0.75).padding(.top, 2)
+            ProgressView(value: p)
+                .tint(done ? .white : color)
+                .background(done ? Color.white.opacity(0.25) : t.pill)
+                .frame(height: 6).clipShape(Capsule())
+                .padding(.top, 10)
+        }
+        .padding(15)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(done ? .white : t.text)
+
+        return Button { store.toggleToday(habit) } label: {
+            if done {
+                inner
+                    .background(Brand.sweep(color), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(.white.opacity(0.30), lineWidth: 1))
+                    .shadow(color: color.opacity(0.4), radius: 12, y: 8)
+            } else {
+                inner
+                    .glassCard(cornerRadius: 20)
+                    .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(color.opacity(0.22), lineWidth: 1.5))
+            }
         }
         .buttonStyle(.plain)
     }
@@ -257,8 +259,7 @@ struct TodayView: View {
         }
         .padding(.horizontal, 18).padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(t.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .shadow(color: t.shadow, radius: 8, y: 4)
+        .glassCard(cornerRadius: 22)
     }
 
     // MARK: Helpers
