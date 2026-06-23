@@ -48,6 +48,13 @@ struct RootView: View {
         .tint(t.acc)
         .font(.system(.body, design: .rounded))
         .foregroundStyle(t.text)
+        .overlay {
+            if let badge = store.pendingAchievement {
+                AchievementCelebration(achievement: badge) { store.pendingAchievement = nil }
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: store.pendingAchievement)
         .animation(.easeInOut(duration: 0.25), value: hasSeenOnboarding)
         .sheet(item: $detailHabit) { habit in
             HabitDetailView(habit: habit)

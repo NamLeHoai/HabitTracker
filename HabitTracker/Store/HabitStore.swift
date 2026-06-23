@@ -21,6 +21,9 @@ final class HabitStore {
     private(set) var global: GlobalStats = .empty
     private(set) var moodIndex: [String: Int] = [:]
 
+    /// Set when a badge is newly unlocked; the UI shows a one-time celebration then clears it.
+    var pendingAchievement: Achievement?
+
     /// habitID -> (dayKey -> count). Authoritative in-memory view used by all derivations.
     /// Observation-tracked (NOT ignored): Today's rows read completion state from here, so a
     /// toggle must notify SwiftUI. Reassigning a subscript triggers the @Observable setter.
@@ -219,12 +222,37 @@ final class HabitStore {
         g.bestStreak = bestAll
         g.totalCheckins = totalAll
         g.perfectDays30 = HabitDerivations.perfectDays(items, days: 30, today: t)
+        g.xp = g.totalCheckins * 12 + g.bestStreak * 8   // monotonic-ish, no extra scan
+        g.level = Level.info(forXP: g.xp).level
         g.dowRates = HabitDerivations.dowRates(items, days: 84, today: t)
         g.weeklyTrend = HabitDerivations.weeklyTrend(items, weeks: 8, today: t)
         g.aggregateHeat = HabitDerivations.heatGrid(items: items, spec: nil, logs: nil, today: t)
         global = g
 
         writeSnapshot()
+        detectAchievements()
+    }
+
+    /// Compare currently-earned badges to the persisted "seen" set. On the very first run we adopt
+    /// the current state silently (no flood of celebrations); afterwards a newly-earned badge is
+    /// surfaced via `pendingAchievement` for the UI to celebrate.
+    private func detectAchievements() {
+        let earned = Achievements.earnedIDs(for: global)
+        let defaults = AppGroup.defaults
+        let key = "seenAchievements"
+
+        guard let seenArray = defaults.stringArray(forKey: key) else {
+            defaults.set(Array(earned), forKey: key)
+            return
+        }
+        let seen = Set(seenArray)
+        let newlyEarned = earned.subtracting(seen)
+        guard !newlyEarned.isEmpty else {
+            if earned != seen { defaults.set(Array(earned), forKey: key) }   // keep in sync
+            return
+        }
+        defaults.set(Array(earned), forKey: key)
+        pendingAchievement = Achievements.all(for: global).first { newlyEarned.contains($0.id) }
     }
 
     /// Publish a lightweight "today" snapshot to the shared App Group and refresh widgets.

@@ -94,6 +94,9 @@ struct TodayView: View {
     private var directionA: some View {
         VStack(spacing: 0) {
             progressCard
+                .padding(.bottom, 14)
+
+            levelCard
                 .padding(.bottom, 22)
 
             sectionLabel("DUE TODAY")
@@ -130,6 +133,13 @@ struct TodayView: View {
         .background(Brand.iridescent(t), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(.white.opacity(0.25), lineWidth: 1))
         .shadow(color: t.acc.opacity(0.4), radius: 16, y: 12)
+    }
+
+    private var levelCard: some View {
+        LevelBar(info: Level.info(forXP: store.global.xp))
+            .padding(.horizontal, 18).padding(.vertical, 16)
+            .frame(maxWidth: .infinity)
+            .glassCard(cornerRadius: 22)
     }
 
     private var dayMessage: String {
@@ -197,10 +207,12 @@ struct TodayView: View {
 
                 HStack(spacing: 10) {
                     pill("🔥 \(store.global.bestStreak) day streak", color: Color(hex: "#FF6B5E"))
-                    pill("⚡ \(doneCount * 40) XP", color: Color(hex: "#E0911C"))
+                    pill("⚡ \(store.global.xp) XP", color: Color(hex: "#E0911C"))
                 }
             }
             .frame(maxWidth: .infinity)
+
+            levelCard.padding(.top, 18)
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                 ForEach(habits) { habit in

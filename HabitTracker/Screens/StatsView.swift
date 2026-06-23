@@ -35,14 +35,42 @@ struct StatsView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
+                    levelCard
                     summaryCards
                     activityCard
                     bestDayCard
                     weeklyTrendCard
+                    achievementsSection
                     perHabitSection
                 }
                 .padding(.horizontal, 20).padding(.top, 10).padding(.bottom, 120)
             }
+        }
+    }
+
+    private var levelCard: some View {
+        LevelBar(info: Level.info(forXP: g.xp))
+            .padding(18)
+            .frame(maxWidth: .infinity)
+            .glassCard(cornerRadius: 22)
+    }
+
+    private var achievementsSection: some View {
+        let badges = Achievements.all(for: g)
+        let earned = badges.filter(\.isEarned).count
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("ACHIEVEMENTS").font(.system(size: 13, weight: .bold)).tracking(0.6).foregroundStyle(t.sub)
+                Spacer()
+                Text("\(earned)/\(badges.count)").font(.system(size: 13, weight: .bold)).foregroundStyle(t.acc)
+            }
+            .padding(.horizontal, 4).padding(.bottom, 12)
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 16) {
+                ForEach(badges) { AchievementBadge(achievement: $0) }
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .glassCard(cornerRadius: 22)
         }
     }
 
