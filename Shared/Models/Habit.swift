@@ -11,7 +11,9 @@ import SwiftData
 
 @Model
 final class Habit {
-    @Attribute(.unique) var id: String = UUID().uuidString
+    // Not `.unique`: CloudKit-backed SwiftData forbids unique constraints. Uniqueness is upheld
+    // by the store's id-keyed upserts instead.
+    var id: String = UUID().uuidString
     var name: String = ""
     var icon: String = "⭐"
     var colorHex: String = "#FF6B5E"

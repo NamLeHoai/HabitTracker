@@ -15,6 +15,7 @@ struct TodayView: View {
     @Environment(\.theme) private var t
     @AppStorage("layoutB") private var layoutB = false
     @State private var toggleTick = 0
+    @State private var showSettings = false
 
     private var habits: [Habit] { store.todayHabits }
 
@@ -40,6 +41,12 @@ struct TodayView: View {
             }
         }
         .sensoryFeedback(.success, trigger: toggleTick)
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+                .environment(store)
+                .environment(\.theme, t)
+                .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: Header
@@ -72,6 +79,11 @@ struct TodayView: View {
 
                 Button { theme.toggle() } label: {
                     Text(theme.isDark ? "☀️" : "🌙").font(.system(size: 17))
+                        .glassChrome(diameter: 40)
+                }
+                Button { showSettings = true } label: {
+                    Image(systemName: "gearshape.fill").font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(t.sub)
                         .glassChrome(diameter: 40)
                 }
             }

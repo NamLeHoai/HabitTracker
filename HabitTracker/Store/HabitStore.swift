@@ -171,6 +171,90 @@ final class HabitStore {
         load()
     }
 
+    // MARK: - Backup / restore
+
+    enum ImportMode { case merge, replace }
+
+    /// Encode the entire store (habits + logs + moods) to pretty-printed JSON.
+    func exportData() -> Data? {
+        let habitDTOs = habits.map { h in
+            BackupData.HabitDTO(id: h.id, name: h.name, icon: h.icon, colorHex: h.colorHex,
+                                category: h.category, kindRaw: h.kindRaw, schedTypeRaw: h.schedTypeRaw,
+                                schedDays: h.schedDays, goalTypeRaw: h.goalTypeRaw, target: h.target,
+                                unit: h.unit, step: h.step, sortOrder: h.sortOrder, createdAt: h.createdAt,
+                                reminderEnabled: h.reminderEnabled, reminderHour: h.reminderHour,
+                                reminderMinute: h.reminderMinute)
+        }
+        let logDTOs = habits.flatMap { h in
+            (h.logs ?? []).map { BackupData.LogDTO(habitID: h.id, dayKey: $0.dayKey, dayStart: $0.dayStart, count: $0.count) }
+        }
+        let moods = (try? context.fetch(FetchDescriptor<MoodEntry>())) ?? []
+        let moodDTOs = moods.map { BackupData.MoodDTO(dayKey: $0.dayKey, dayStart: $0.dayStart, value: $0.value) }
+
+        let backup = BackupData(exportedAt: Date(), habits: habitDTOs, logs: logDTOs, moods: moodDTOs)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return try? encoder.encode(backup)
+    }
+
+    /// Restore from a backup. `.replace` wipes first; `.merge` upserts onto existing data.
+    @discardableResult
+    func importData(_ data: Data, mode: ImportMode) -> Bool {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let backup = try? decoder.decode(BackupData.self, from: data) else { return false }
+
+        if mode == .replace {
+            for h in (try? context.fetch(FetchDescriptor<Habit>())) ?? [] { NotificationManager.cancel(habitID: h.id); context.delete(h) }
+            for m in (try? context.fetch(FetchDescriptor<MoodEntry>())) ?? [] { context.delete(m) }
+        }
+
+        var habitByID: [String: Habit] = [:]
+        for h in (try? context.fetch(FetchDescriptor<Habit>())) ?? [] { habitByID[h.id] = h }
+
+        for dto in backup.habits {
+            let habit = habitByID[dto.id] ?? {
+                let new = Habit(id: dto.id, name: dto.name, icon: dto.icon, colorHex: dto.colorHex,
+                                category: dto.category, kind: dto.kind, schedule: dto.schedule, goal: dto.goal,
+                                unit: dto.unit, sortOrder: dto.sortOrder, createdAt: dto.createdAt,
+                                reminderEnabled: dto.reminderEnabled, reminderHour: dto.reminderHour,
+                                reminderMinute: dto.reminderMinute)
+                context.insert(new)
+                habitByID[dto.id] = new
+                return new
+            }()
+            habit.name = dto.name; habit.icon = dto.icon; habit.colorHex = dto.colorHex
+            habit.category = dto.category; habit.kindRaw = dto.kindRaw
+            habit.schedTypeRaw = dto.schedTypeRaw; habit.schedDays = dto.schedDays
+            habit.goalTypeRaw = dto.goalTypeRaw; habit.target = dto.target; habit.step = dto.step
+            habit.unit = dto.unit; habit.sortOrder = dto.sortOrder
+            habit.reminderEnabled = dto.reminderEnabled
+            habit.reminderHour = dto.reminderHour; habit.reminderMinute = dto.reminderMinute
+        }
+
+        for dto in backup.logs {
+            guard let habit = habitByID[dto.habitID] else { continue }
+            if let existing = (habit.logs ?? []).first(where: { $0.dayKey == dto.dayKey }) {
+                existing.count = dto.count
+            } else {
+                context.insert(HabitLog(dayKey: dto.dayKey, dayStart: dto.dayStart, count: dto.count, habit: habit))
+            }
+        }
+
+        var moodByKey: [String: MoodEntry] = [:]
+        for m in (try? context.fetch(FetchDescriptor<MoodEntry>())) ?? [] { moodByKey[m.dayKey] = m }
+        for dto in backup.moods {
+            if let existing = moodByKey[dto.dayKey] { existing.value = dto.value }
+            else { context.insert(MoodEntry(dayKey: dto.dayKey, dayStart: dto.dayStart, value: dto.value)) }
+        }
+
+        try? context.save()
+        load()
+        for habit in habits { NotificationManager.reschedule(for: habit) }
+        return true
+    }
+
     // MARK: - Internals
 
     /// Idempotent per-day upsert: one row per (habit, dayKey); delete the row when value hits 0.

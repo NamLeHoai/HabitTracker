@@ -10,7 +10,8 @@ import SwiftData
 
 @Model
 final class MoodEntry {
-    @Attribute(.unique) var dayKey: String = ""   // "YYYY-MM-DD"
+    var dayKey: String = ""   // "YYYY-MM-DD" — uniqueness upheld by the store's per-day upsert
+                              // (not `.unique`: CloudKit-backed SwiftData forbids unique constraints)
     var dayStart: Date = Date()
     var value: Int = 0                             // 1...5
 
