@@ -7,10 +7,12 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import WidgetKit
 
 struct SettingsView: View {
     @Environment(HabitStore.self) private var store
     @Environment(\.theme) private var t
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
     @State private var exportURL: URL?
@@ -20,12 +22,17 @@ struct SettingsView: View {
     @State private var iCloudOn = AppGroup.defaults.bool(forKey: "iCloudSyncEnabled")
     @State private var toast: String?
 
+    @State private var widgetBackground = WidgetThemeStore().background
+    @State private var widgetAppearance = WidgetThemeStore().appearance
+    @State private var widgetTextColor = WidgetThemeStore().textColor
+
     var body: some View {
         VStack(spacing: 0) {
             header
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
-                    syncSection
+                    if !SharedStore.cloudKitTemporarilyDisabled { syncSection }
+                    widgetSection
                     dataSection
                     if let toast {
                         Text(toast).font(.system(size: 13, weight: .semibold))
@@ -109,6 +116,72 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity)
             .glassCard(cornerRadius: 18)
         }
+    }
+
+    // MARK: Widget
+
+    private var widgetResolver: WidgetThemeResolver {
+        WidgetThemeResolver(background: widgetBackground, appearance: widgetAppearance, textColor: widgetTextColor)
+    }
+    private var widgetScheme: ColorScheme { widgetResolver.forcedColorScheme ?? colorScheme }
+
+    private var widgetSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            label("WIDGET")
+            VStack(alignment: .leading, spacing: 14) {
+                widgetPreview
+                Divider().overlay(t.sep)
+                Picker("Background", selection: $widgetBackground) {
+                    ForEach(WidgetBackgroundStyle.allCases, id: \.self) { Text(name($0)).tag($0) }
+                }
+                Picker("Appearance", selection: $widgetAppearance) {
+                    ForEach(WidgetAppearance.allCases, id: \.self) { Text(name($0)).tag($0) }
+                }
+                Picker("Text Color", selection: $widgetTextColor) {
+                    ForEach(WidgetTextColor.allCases, id: \.self) { Text(name($0)).tag($0) }
+                }
+                Text("Sets the default for your home-screen widgets. You can still override a single widget by long-pressing it and choosing Edit Widget.")
+                    .font(.system(size: 12)).foregroundStyle(t.faint)
+            }
+            .tint(t.acc)
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .glassCard(cornerRadius: 18)
+        }
+        .onChange(of: widgetBackground) { _, v in widgetStore.background = v; reloadWidgets() }
+        .onChange(of: widgetAppearance) { _, v in widgetStore.appearance = v; reloadWidgets() }
+        .onChange(of: widgetTextColor) { _, v in widgetStore.textColor = v; reloadWidgets() }
+    }
+
+    private var widgetPreview: some View {
+        let r = widgetResolver, scheme = widgetScheme
+        return VStack(alignment: .leading, spacing: 0) {
+            Text("TODAY").font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundStyle(r.secondaryTextColor(for: scheme))
+            Spacer(minLength: 8)
+            Text("3 of 5 done").font(.system(size: 16, weight: .heavy, design: .rounded))
+                .foregroundStyle(r.resolvedTextColor(for: scheme))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 84)
+        .padding(14)
+        .background(r.backgroundGradient(for: scheme), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var widgetStore: WidgetThemeStore { WidgetThemeStore() }
+    private func reloadWidgets() { WidgetCenter.shared.reloadAllTimelines() }
+
+    private func name(_ b: WidgetBackgroundStyle) -> String {
+        switch b {
+        case .brand: "Iridescent"; case .ocean: "Ocean"; case .sunset: "Sunset"
+        case .forest: "Forest"; case .graphite: "Graphite"; case .mono: "Minimal"
+        }
+    }
+    private func name(_ a: WidgetAppearance) -> String {
+        switch a { case .system: "Automatic"; case .light: "Light"; case .dark: "Dark" }
+    }
+    private func name(_ c: WidgetTextColor) -> String {
+        switch c { case .auto: "Automatic"; case .light: "Light"; case .dark: "Dark"; case .accent: "Accent" }
     }
 
     private func row(_ icon: String, _ title: String, _ subtitle: String) -> some View {

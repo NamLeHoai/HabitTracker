@@ -13,10 +13,16 @@ enum SharedStore {
     static let schema = Schema([Habit.self, HabitLog.self, MoodEntry.self])
     static let cloudContainerID = "iCloud.com.namle.HabitTracker"
 
-    /// Gated off by default. The Settings toggle flips it; takes effect on next launch (the
-    /// container is built once at startup). Requires the iCloud capability + a provisioned
-    /// CloudKit container, so it stays off until the user opts in.
-    static var isCloudEnabled: Bool { AppGroup.defaults.bool(forKey: "iCloudSyncEnabled") }
+    /// Master kill-switch. While `true`, iCloud sync is fully off (container is local) regardless
+    /// of the user flag, and the Settings sync section is hidden. To re-enable: flip to `false`,
+    /// re-add the iCloud/CloudKit keys to both .entitlements, and provision the CloudKit container.
+    static let cloudKitTemporarilyDisabled = true
+
+    /// Gated off by default. The Settings toggle flips the flag; takes effect on next launch.
+    static var isCloudEnabled: Bool {
+        guard !cloudKitTemporarilyDisabled else { return false }
+        return AppGroup.defaults.bool(forKey: "iCloudSyncEnabled")
+    }
 
     static func container() throws -> ModelContainer {
         let configuration = ModelConfiguration(
